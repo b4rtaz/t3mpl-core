@@ -1,4 +1,4 @@
-# T3MPL
+# T3MPL Core
 
 [![Build Status](https://travis-ci.org/b4rtaz/t3mpl-core.svg?branch=master)](https://travis-ci.org/b4rtaz/t3mpl-core) [![Coverage Status](https://coveralls.io/repos/github/b4rtaz/t3mpl-core/badge.svg?branch=master)](https://coveralls.io/github/b4rtaz/t3mpl-core?branch=master)
 
