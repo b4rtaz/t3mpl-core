@@ -17,7 +17,8 @@
 	"scripts": {
 		"start": "tsc --watch",
 		"build": "tsc",
-		"test": "karma start",
+		"test": "karma start --browsers Firefox --single-run",
+		"test:browser": "karma start --browsers Firefox",
 		"lint": "tslint --project tsconfig.json"
 	},
 	"license": "MIT",
