@@ -16,11 +16,12 @@ module.exports = function(config) {
 		plugins: [
 			require('karma-jasmine'),
 			require('karma-chrome-launcher'),
+			require('karma-firefox-launcher'),
 			require('karma-typescript'),
 			require('karma-spec-reporter')
 		],
 		reporters: [ 'progress', 'karma-typescript' ],
-		browsers: [ 'Chrome' ],
+		browsers: [ 'ChromeHeadless', 'FirefoxHeadless' ],
 		autoWatch: true
 	})
 }
