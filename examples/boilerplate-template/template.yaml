@@ -1,0 +1,71 @@
+meta:
+  version: 1
+  name: Boilerplate
+  license: MIT
+  author: b4rtaz <email@example.com> (https://website.com/)
+  exportable: true
+  homepageUrl: https://website.com/
+  donationUrl: https://website.com/
+  filePaths:
+    - license.txt
+    - index.html
+    - assets/style.css
+    - assets/favicon.png
+
+dataContract:
+
+  COMMON:
+    _label: Common
+    sections:
+      META:
+        _label: Meta
+        properties:
+          LANGUAGE:
+            type: (choice)
+            valuesSet: (iso6391Languages)
+            defaultValue: en
+            _label: Language
+          DIRECTION:
+            type: (choice)
+            valuesSet: (direction)
+            defaultValue: auto
+            _label: Direction
+          TITLE:
+            type: (text)
+            defaultValue: My Page Title
+            _label: Page Title
+          DESCRIPTION:
+            type: (text)
+            defaultValue: My Page Description
+            _label: Page Description
+          FAVICON:
+            type: (image)
+            width: 32
+            height: 32
+            defaultFilePath: assets/favicon.png
+            _label: Favicon
+          PRE_HTML:
+            type: (html)
+            _label: Pre HTML
+            _description: i.e. cookie banner
+            required: false
+      FOOTER:
+        _label: Footer
+        properties:
+          COPYRIGHT:
+            type: (text)
+            _label: Copyright
+            defaultValue: All rights reserved.
+          POWERED_BY:
+            type: (boolean)
+            defaultValue: true
+            _label: Powered By
+          POST_HTML:
+            type: (html)
+            _label: Post HTML
+            _description: i.e. plugins, tracking
+            required: false
+pages:
+  INDEX:
+    filePath: index.html
+    templateFilePath: index.html

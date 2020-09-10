@@ -1,0 +1,40 @@
+{
+	"name": "t3mpl-core",
+	"version": "0.1.0",
+	"author": "Bartlomiej Tadych (http://n4no.com)",
+	"main": "./t3mpl.js",
+	"typings": "./t3mpl.d.ts",
+	"files": [
+		"t3mpl.js",
+		"t3mpl.d.ts",
+		"core",
+		"cli"
+	],
+	"scripts": {
+		"start": "tsc --watch",
+		"build": "tsc",
+		"test": "karma start",
+		"lint": "tslint --project tsconfig.json"
+	},
+	"license": "MIT",
+	"dependencies": {
+		"handlebars": "^4.7.6",
+		"js-yaml": "^3.14.0",
+		"marked": "^1.1.1",
+		"moment": "^2.27.0"
+	},
+	"devDependencies": {
+		"@types/jasmine": "^3.5.14",
+		"@types/js-yaml": "^3.12.5",
+		"@types/marked": "^1.1.0",
+		"@types/node": "^14.6.4",
+		"jasmine-core": "^3.6.0",
+		"karma": "^5.1.1",
+		"karma-chrome-launcher": "^3.1.0",
+		"karma-jasmine": "^4.0.1",
+		"karma-spec-reporter": "0.0.32",
+		"karma-typescript": "^5.1.0",
+		"tslint": "~5.15.0",
+		"typescript": "^3.5.3"
+	}
+}
