@@ -17,8 +17,7 @@ module.exports = function(config) {
 			require('karma-jasmine'),
 			require('karma-chrome-launcher'),
 			require('karma-firefox-launcher'),
-			require('karma-typescript'),
-			require('karma-spec-reporter')
+			require('karma-typescript')
 		],
 		reporters: [
 			'progress',
@@ -28,6 +27,12 @@ module.exports = function(config) {
 			'ChromeHeadless',
 			'FirefoxHeadless'
 		],
-		autoWatch: true
+		autoWatch: true,
+		karmaTypescriptConfig: {
+			"reports": {
+				"html": "coverage",
+				"lcovonly": "coverage"
+			}
+		}
 	})
 }
