@@ -20,8 +20,14 @@ module.exports = function(config) {
 			require('karma-typescript'),
 			require('karma-spec-reporter')
 		],
-		reporters: [ 'progress', 'karma-typescript' ],
-		browsers: [ 'ChromeHeadless', 'FirefoxHeadless' ],
+		reporters: [
+			'progress',
+			'karma-typescript'
+		],
+		browsers: [
+			'ChromeHeadless',
+			'FirefoxHeadless'
+		],
 		autoWatch: true
 	})
 }

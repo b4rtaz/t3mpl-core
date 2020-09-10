@@ -110,7 +110,7 @@ pages:
 		const date = GAMMA.properties.DATE as DateTimePropertyContract;
 		expect(date.type).toEqual(PropertyContractType.dateTime);
 		expect(date._label).toEqual('Date');
-		expect(date.defaultValue).toEqual('2020-09-09T00:01:36.220+02:00');
+		expect(new Date(date.defaultValue)).toEqual(new Date('2020-09-09T00:01:36.220+02:00'));
 		expect(date.required).toBeFalse();
 
 		expect(t.pages.TEST.filePath).toEqual('t3st.html');
