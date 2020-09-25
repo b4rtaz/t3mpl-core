@@ -1,10 +1,12 @@
 import { ReadableStorage } from '../../storage';
+import { relativize } from '../../utils/path-utils';
 import { TemplateHelper } from '../template-helper';
 
 export class FileImageTemplateHelper implements TemplateHelper {
 	public readonly name = '$image';
 
 	public constructor(
+		private readonly currentPagePath: string,
 		private readonly contentStorage: ReadableStorage) {
 	}
 
@@ -13,6 +15,6 @@ export class FileImageTemplateHelper implements TemplateHelper {
 			throw new Error(`Cannot find an image file ${filePath}.`);
 		}
 
-		return filePath;
+		return relativize(this.currentPagePath, filePath);
 	}
 }

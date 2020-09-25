@@ -43,7 +43,7 @@ export class TemplateRenderer {
 		});
 		const output = template(extendedData, {
 			partials: getPartials(currentPage.templateFilePath, this.templateStorage),
-			helpers: getHelpers(this.inline, this.templateStorage, this.contentStorage)
+			helpers: getHelpers(this.inline, currentPage.filePath, this.templateStorage, this.contentStorage)
 		});
 		return output;
 	}
@@ -66,7 +66,7 @@ export function getPartials(templateFilePath: string, templateStorage: ReadableS
 	return partials;
 }
 
-export function getHelpers(inline: boolean, templateStorage: ReadableStorage, contentStorage: ReadableStorage): HelperMap {
+export function getHelpers(inline: boolean, currentPagePath: string, templateStorage: ReadableStorage, contentStorage: ReadableStorage): HelperMap {
 	const helpers = [];
 
 	if (inline) {
@@ -75,10 +75,10 @@ export function getHelpers(inline: boolean, templateStorage: ReadableStorage, co
 		helpers.push(new InlineImageTemplateHelper(contentStorage));
 		helpers.push(new InlinePageLinkTemplateHelper());
 	} else {
-		helpers.push(new FileCssTemplateHelper(templateStorage));
-		helpers.push(new FileScriptTemplateHelper(templateStorage));
-		helpers.push(new FileImageTemplateHelper(contentStorage));
-		helpers.push(new FilePageLinkTemplateHelper());
+		helpers.push(new FileCssTemplateHelper(currentPagePath, templateStorage));
+		helpers.push(new FileScriptTemplateHelper(currentPagePath, templateStorage));
+		helpers.push(new FileImageTemplateHelper(currentPagePath, contentStorage));
+		helpers.push(new FilePageLinkTemplateHelper(currentPagePath));
 	}
 
 	helpers.push(new HtmlTemplateHelper(contentStorage));

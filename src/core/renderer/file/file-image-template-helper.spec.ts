@@ -8,7 +8,7 @@ describe('FileImageTemplateHelper', () => {
 
 	beforeEach(() => {
 		storage = new MemoryStorage();
-		helper = new FileImageTemplateHelper(storage);
+		helper = new FileImageTemplateHelper('index.html', storage);
 	});
 
 	it('execute() returns proper value', () => {

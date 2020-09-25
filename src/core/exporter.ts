@@ -32,12 +32,15 @@ export function exportRelease(
 
 	exportStorage(contentStorage, usedFilePaths, handler, filePath => {
 		return !filePath.startsWith(HTML_CONTENT_BASE_PATH) &&
-			!filePath.startsWith(MARKDOWN_CONTENT_BASE_PATH);
+			!filePath.startsWith(MARKDOWN_CONTENT_BASE_PATH) &&
+			filePath !== TEMPLATE_DATA_FILE_NAME;
 	});
 	exportStorage(templateStorage, usedFilePaths, handler, filePath => {
 		const fileExt = getFileExt(filePath);
 		return fileExt !== PARTIAL_EXT &&
 			filePath !== TEMPLATE_MANIFEST_FILE_NAME &&
+			!filePath.startsWith(HTML_CONTENT_BASE_PATH) &&
+			!filePath.startsWith(MARKDOWN_CONTENT_BASE_PATH) &&
 			!pages.find(p => p.templateFilePath === filePath);
 	});
 }

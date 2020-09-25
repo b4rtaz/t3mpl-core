@@ -70,6 +70,23 @@ describe('PagesResolver', () => {
 		expect(p[9].filePath).toEqual('no-ext-1');
 	});
 
+	it('resolve() throws error when dataPath has pointer to invalid type', () => {
+		const data = { A: { B: { C: 'string' } }};
+
+		const pages: PageContractMap = {
+			ARTICLE: {
+				filePath: 'article.html',
+				templateFilePath: 'article.html',
+				multiplier: {
+					dataPath: 'A.B.C'
+				}
+			}
+		};
+
+		expect(() => resolver.resolve(pages, data))
+			.toThrowMatching((e: Error) => e.message === 'Unsuported data type. Collection was expected.');
+	});
+
 	it('resolve() divider', () => {
 		const data = { A: { B: { C: [] } }};
 		for (let i = 0; i < 30; i++) {

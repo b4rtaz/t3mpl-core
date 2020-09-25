@@ -1,4 +1,13 @@
-import { getFileExt, getFilePathWithoutExt, isTextFileExt, getBasePath, simplifyPath, extendFileName, replaceFileName } from './path-utils';
+import {
+	extendFileName,
+	getBasePath,
+	getFileExt,
+	getFilePathWithoutExt,
+	isTextFileExt,
+	relativize,
+	replaceFileName,
+	simplifyPath
+} from './path-utils';
 
 describe('PathUtils', () => {
 
@@ -60,5 +69,16 @@ describe('PathUtils', () => {
 		expect(() => simplifyPath('../a.js')).toThrowMatching(valid);
 		expect(() => simplifyPath('a/b/../../../a.js')).toThrowMatching(valid);
 		expect(() => simplifyPath('..')).toThrowMatching(valid);
+	});
+
+	it('relativize() returns proper value', () => {
+		const r1 = relativize('sub-folder/index.html', 'assets/image.jpg');
+		expect(r1).toEqual('../assets/image.jpg');
+
+		const r2 = relativize('sub-folder/sub-sub-folder/index.html', 'assets/image.jpg');
+		expect(r2).toEqual('../../assets/image.jpg');
+
+		const r3 = relativize('index.html', 'assets/image.jpg');
+		expect(r3).toEqual('assets/image.jpg');
 	});
 });

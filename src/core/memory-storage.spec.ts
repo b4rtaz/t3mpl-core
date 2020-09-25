@@ -51,4 +51,14 @@ describe('MemoryStorage', () => {
 		expect(() => storage.setContent('binary', 'a.txt', '3'))
 			.toThrowMatching((e: Error) => e.message.startsWith('Previous file has diffrent content type'));
 	});
+
+	it('getContent() throws error when cannot file the file', () => {
+		expect(() => storage.getContent('text', 'unknown.json'))
+			.toThrowMatching((e: Error) => e.message.startsWith('Cannot find the file'));
+	});
+
+	it('getEntry() throws error when cannot file the file', () => {
+		expect(() => storage.getEntry('text', 'unknown.json'))
+			.toThrowMatching((e: Error) => e.message.startsWith('Cannot find the file'));
+	});
 });

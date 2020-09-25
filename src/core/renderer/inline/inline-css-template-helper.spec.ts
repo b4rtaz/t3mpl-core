@@ -5,6 +5,7 @@ describe('InlineCssTemplateHelper', () => {
 
 	const DATA_URL1 = 'data:image/gif;base64,d41d8cd98f00b204e9800998ecf8427e';
 	const DATA_URL2 = 'data:image/gif;base64,3c81cc62cd8a24b231d0c0db34feda61';
+	const FONT_URL = 'https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap';
 	const EXTERNAL_URL = 'https://domain.com/b.jpg';
 	const HASH_URL = '#svgid';
 	const COLOR1 = '#A03131';
@@ -19,10 +20,11 @@ describe('InlineCssTemplateHelper', () => {
 			`@import 'import1.css';
 			@import   'import2.css'  ;
 			@import 'import3.css' ;
-			body {background: url   ('${DATA_URL1}') ;}
+			@import '${FONT_URL}';
+			body {background: url   ('file.png') ;}
 			section {background: url(${DATA_URL2});}
 			div {background: url(${EXTERNAL_URL}) ;}
-			div {background: url(${HASH_URL}) ;}`);
+			nav {background: url(${HASH_URL}) ;}`);
 
 		storage.setContent('dataUrl', 'file.png', DATA_URL1);
 		storage.setContent('text', 'import1.css', `h1 {color: ${COLOR1};}`);
@@ -42,6 +44,7 @@ describe('InlineCssTemplateHelper', () => {
 		expect(style).not.toBeNull();
 		expect(style.getAttribute('type')).toEqual('text/css');
 		const css = style.innerHTML;
+		expect(css).toContain(FONT_URL);
 		expect(css).toContain(DATA_URL1);
 		expect(css).toContain(DATA_URL2);
 		expect(css).toContain(EXTERNAL_URL);

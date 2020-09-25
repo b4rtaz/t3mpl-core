@@ -65,3 +65,10 @@ export function simplifyPath(filePath: string): string {
 	}
 	return outParts.join('/');
 }
+
+export function relativize(targetFilePath: string, assetFilePath: string): string {
+	const parts = targetFilePath.split('/');
+	parts.splice(parts.length - 1, 1);
+	const base = parts.map(() => '../').join('');
+	return base + assetFilePath;
+}

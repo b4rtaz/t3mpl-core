@@ -36,5 +36,14 @@ describe('FileNameGenerator', () => {
 		});
 		expect(t2).toEqual('%%%%%%%%%%%%%%%%%%%.jpeg');
 		expect(t2.length).toEqual(24);
+
+		const t3 = generateFileName({
+			name: 'short',
+			fileExt: '.jpeg',
+			uniqueIdGenerator: fakeUniqueIdGenerator
+		});
+
+		expect(t3).toEqual('short-%%%%%%%%%%%%%.jpeg');
+		expect(t3.length).toEqual(24);
 	});
 });

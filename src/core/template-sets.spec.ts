@@ -18,6 +18,11 @@ describe('TemplateSets', () => {
 		knownValues.forEach(value => expect(keys).toContain(value));
 	});
 
+	it('getChoiceValuesSet() throws error when set is unknown', () => {
+		expect(() => getChoiceValuesSet('(uknonw)'))
+			.toThrowMatching((e: Error) => e.message.endsWith('is not supported.'));
+	});
+
 	it('getTextValueSet() returns a trimmed string', () => {
 		const setNames = ['(lipsumXS)', '(lipsumS)', '(lipsumM)', '(lipsumL)', '(lipsumXL)', '(lipsumXXL)'];
 
@@ -25,5 +30,10 @@ describe('TemplateSets', () => {
 			const value = getTextValueSet(name);
 			expect(value).toMatch(/^[^\s].*[^\s]$/);
 		});
+	});
+
+	it('getTextValueSet() throws error when set is unknown', () => {
+		expect(() => getTextValueSet('(uknonw)'))
+			.toThrowMatching((e: Error) => e.message.endsWith('is not supported.'));
 	});
 });

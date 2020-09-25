@@ -5,11 +5,16 @@ describe('FileCssTemplateHelper', () => {
 
 	const CSS_FILE_PATH = 'foo/t3st.css';
 
-	it('execute() returns proper value', () => {
-		const storage = new MemoryStorage();
-		storage.setContent('text', CSS_FILE_PATH, 'a {}');
+	let storage: MemoryStorage;
+	let helper: FileCssTemplateHelper;
 
-		const helper = new FileCssTemplateHelper(storage);
+	beforeEach(() => {
+		storage = new MemoryStorage();
+		helper = new FileCssTemplateHelper('index.html', storage);
+	});
+
+	it('execute() returns proper value', () => {
+		storage.setContent('text', CSS_FILE_PATH, 'a {}');
 
 		const html = helper.execute(CSS_FILE_PATH);
 
@@ -19,5 +24,10 @@ describe('FileCssTemplateHelper', () => {
 		expect(link).not.toBeNull();
 		expect(link.getAttribute('rel')).toEqual('stylesheet');
 		expect(link.getAttribute('href')).toEqual(CSS_FILE_PATH);
+	});
+
+	it('execute() throws error when cannot find the file', () => {
+		expect(() => helper.execute('unknown.css'))
+			.toThrowMatching((e: Error) => e.message.startsWith('Cannot find CSS file'));
 	});
 });

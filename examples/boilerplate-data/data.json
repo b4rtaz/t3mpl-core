@@ -3,10 +3,30 @@
         "name": "Boilerplate",
         "version": 1,
         "filePaths": [
-            "assets/favicon.png"
+            "data.json",
+            "content/markdown/e4vwb4lmr7yzixo4hltts.md",
+            "content/markdown/rpjwgpd87dplasmn51gna.md",
+            "assets/favicon.png",
+            "assets/og-image.png"
         ]
     },
     "data": {
+        "PAGES": {
+            "PAGES": {
+                "PAGES": [
+                    {
+                        "TITLE": "Contact",
+                        "FILE_PATH": "contact",
+                        "CONTENT": "content/markdown/rpjwgpd87dplasmn51gna.md"
+                    },
+                    {
+                        "TITLE": "About us",
+                        "FILE_PATH": "pages/about-us",
+                        "CONTENT": "content/markdown/e4vwb4lmr7yzixo4hltts.md"
+                    }
+                ]
+            }
+        },
         "COMMON": {
             "META": {
                 "LANGUAGE": "en",
@@ -14,10 +34,11 @@
                 "TITLE": "My Page Title",
                 "DESCRIPTION": "My Page Description",
                 "FAVICON": "assets/favicon.png",
+                "OG_IMAGE": "assets/og-image.png",
                 "PRE_HTML": null
             },
             "FOOTER": {
-                "COPYRIGHT": "All rights reserved.",
+                "COPYRIGHT": "All rights reserved",
                 "POWERED_BY": true,
                 "POST_HTML": null
             }

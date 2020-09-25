@@ -11,6 +11,11 @@ import { TemplateManifestParser, transformToLabel, validFilePath, validPropertyN
 describe('TemplateManifestParser', () => {
 	const parser = new TemplateManifestParser();
 
+	it('parse() throws error when input is empty', () => {
+		expect(() => parser.parse(''))
+			.toThrowMatching((e: Error) => e.message.startsWith('The input is empty'));
+	});
+
 	it('should parse an example as expected', () => {
 		const t = parser.parse(
 `meta:
@@ -50,11 +55,16 @@ dataContract:
               CHOICE:
                 type: (choice)
                 values: [alfa(a), beta]
+              CHOICE_SET:
+                type: (choice)
+                valuesSet: (direction)
               DATE:
                 type: (dateTime)
                 defaultValue: 2020-09-09T00:01:36.220+02:00
                 required: false
-
+              COLOR:
+                type: (color)
+                defaultValue: '#CE4848'
 pages:
   TEST:
     filePath: t3st.html
@@ -107,6 +117,13 @@ pages:
 		expect(choiceValueValues[0]).toEqual('alfa');
 		expect(choiceValueValues[1]).toEqual('beta');
 
+		const choiceSet = GAMMA.properties.CHOICE_SET as ChoicePropertyContract;
+		expect(choiceSet.type).toEqual(PropertyContractType.choice);
+		const choiceSetValueKeys = Object.keys(choiceSet.values);
+		expect(choiceSetValueKeys).toContain('ltr');
+		expect(choiceSetValueKeys).toContain('rtl');
+		expect(choiceSetValueKeys).toContain('auto');
+
 		const date = GAMMA.properties.DATE as DateTimePropertyContract;
 		expect(date.type).toEqual(PropertyContractType.dateTime);
 		expect(date._label).toEqual('Date');
@@ -122,6 +139,11 @@ pages:
 		expect(t.pages.TEST.multiplier).not.toBeNull();
 		expect(t.pages.TEST.multiplier.dataPath).toEqual('Q.W.E.R.T.Y');
 		expect(t.pages.TEST.multiplier.fileNameDataPath).toEqual('P.Q');
+
+		const color = GAMMA.properties.COLOR as DateTimePropertyContract;
+		expect(color.type).toEqual(PropertyContractType.color);
+		expect(color._label).toEqual('Color');
+		expect(color.defaultValue).toEqual('#CE4848');
 	});
 
 	it('validPropertyName() valids correctly', () => {

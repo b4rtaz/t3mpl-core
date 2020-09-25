@@ -8,7 +8,8 @@ module.exports = function(config) {
 		  'src/**/*.ts': [ 'karma-typescript' ]
 		},
 		exclude: [
-			'src/t3mpl.ts'
+			'src/t3mpl.ts',
+			'src/cli/cli.ts'
 		],
 		karmaTypescriptConfig: {
 			tsconfig: './tsconfig.json',

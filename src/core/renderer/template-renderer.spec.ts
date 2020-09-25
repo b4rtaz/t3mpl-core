@@ -9,8 +9,8 @@ describe('TemplateRenderer', () => {
 		const templateStorage = new MemoryStorage();
 		const contentStorage = new MemoryStorage();
 
-		const inline = getHelpers(true, templateStorage, contentStorage);
-		const notInline = getHelpers(false, templateStorage, contentStorage);
+		const inline = getHelpers(true, 'index.html', templateStorage, contentStorage);
+		const notInline = getHelpers(false, 'index.html', templateStorage, contentStorage);
 
 		expect(inline.length).toEqual(notInline.length);
 	});
@@ -32,7 +32,8 @@ describe('TemplateRenderer', () => {
 
 	it('render() returns proper value', () => {
 		const templateStorage = new MemoryStorage();
-		templateStorage.setContent('text', 'page.html', 'a_{{A.B.C}}_z');
+		templateStorage.setContent('text', 'page.html', '{{> header}}_a_{{A.B.C}}_z_{{{$copyright}}}');
+		templateStorage.setContent('text', 'header.partial', '1234');
 		const contentStorage = new MemoryStorage();
 		const pagesDataGenerator = new PagesDataGenerator();
 		const renderer = new TemplateRenderer(false, templateStorage, contentStorage, pagesDataGenerator);
@@ -50,7 +51,7 @@ describe('TemplateRenderer', () => {
 
 		const html = renderer.render(pages, pages[0], data);
 
-		expect(html).toEqual('a_Q_z');
+		expect(html.startsWith('1234_a_Q_z_')).toBeTrue();
 		expect((<any>data).$PAGES).toBeUndefined();
 		expect((<any>data).$PAGE).toBeUndefined();
 	});
