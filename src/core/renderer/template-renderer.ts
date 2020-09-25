@@ -66,9 +66,10 @@ export function getPartials(templateFilePath: string, templateStorage: ReadableS
 	return partials;
 }
 
-export function getHelpers(inline: boolean, currentPagePath: string, templateStorage: ReadableStorage, contentStorage: ReadableStorage): HelperMap {
-	const helpers = [];
+export function getHelpers(inline: boolean, currentPagePath: string,
+	templateStorage: ReadableStorage, contentStorage: ReadableStorage): HelperMap {
 
+	const helpers = [];
 	if (inline) {
 		helpers.push(new InlineCssTemplateHelper(templateStorage));
 		helpers.push(new InlineScriptTemplateHelper(templateStorage));
