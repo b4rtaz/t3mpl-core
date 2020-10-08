@@ -1,5 +1,9 @@
-import { cli } from './cli/cli';
+import { main } from './cli/main';
 
-if (require.main === module) {
-	cli();
+function isNode(): boolean {
+	return typeof module !== 'undefined' && module.exports;
+}
+
+if (isNode()) {
+	main();
 }

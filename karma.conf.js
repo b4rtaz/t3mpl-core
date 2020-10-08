@@ -9,7 +9,7 @@ module.exports = function(config) {
 		},
 		exclude: [
 			'src/t3mpl.ts',
-			'src/cli/cli.ts'
+			'src/cli/**/*.ts'
 		],
 		karmaTypescriptConfig: {
 			tsconfig: './tsconfig.json',

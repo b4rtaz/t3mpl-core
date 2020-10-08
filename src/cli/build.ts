@@ -1,23 +1,17 @@
 import * as fs from 'fs';
-import * as process from 'process';
 
+import { DataActivator } from '../core/data/data-activator';
 import { DataSerializer } from '../core/data/data-serializer';
 import { PagesDataGenerator } from '../core/data/pages-data-generator';
 import { exportRelease } from '../core/exporter';
 import { MemoryStorage } from '../core/memory-storage';
+import { TemplateData } from '../core/model';
 import { PagesResolver } from '../core/pages-resolver';
 import { TemplateRenderer } from '../core/renderer/template-renderer';
 import { ContentType } from '../core/storage';
 import { TemplateManifestParser } from '../core/template-manifest-parser';
 import { getBasePath, getFileExt, isTextFileExt, simplifyPath } from '../core/utils/path-utils';
-
-function getArg(name: string): string {
-	const arg = process.argv.find(a => a.startsWith(name));
-	if (arg) {
-		return arg.substring(name.length);
-	}
-	throw new Error(`The argument ${name} is required.`);
-}
+import { getArg, tryGetArg } from './node-utils';
 
 function readFiles(basePath: string, filePaths: string[]): MemoryStorage {
 	const storage = new MemoryStorage();
@@ -45,32 +39,45 @@ function writeFile(path: string, buffer: Buffer) {
 	console.log(`${path} ${buffer.byteLength} bytes`);
 }
 
-export function cli() {
-	if (process.argv[2] !== 'build') {
-		throw new Error('Unknow command.');
-	}
-
+export function build() {
 	const manifestPath = getArg('--manifest=');
-	const dataPath = getArg('--data=');
+	const exampleData = tryGetArg('--exampleData=') === 'true';
+	const dataPath = exampleData ? null : getArg('--data=');
 	const outDir = getArg('--outDir=');
 
 	const manifestRaw = fs.readFileSync(manifestPath, 'utf8');
-	const dataRaw = fs.readFileSync(dataPath, 'utf8');
 
 	const parser = new TemplateManifestParser();
 	const manifest = parser.parse(manifestRaw);
 
-	const dataSerializer = new DataSerializer();
-	const data = dataSerializer.deserialize(dataRaw);
-
 	const templateStorage = readFiles(getBasePath(manifestPath), manifest.meta.filePaths);
-	const contentStorage = readFiles(getBasePath(dataPath), data.meta.filePaths);
+	let contentStorage: MemoryStorage;
+	let templateData: TemplateData;
+
+	if (exampleData) {
+		contentStorage = new MemoryStorage();
+		const dataActivator = new DataActivator(templateStorage, contentStorage);
+		const data = dataActivator.createInstance(manifest.dataContract);
+		templateData = {
+			data: data,
+			meta: {
+				name: manifest.meta.name,
+				version: manifest.meta.version,
+				filePaths: contentStorage.getFilePaths(['binary', 'text'])
+			}
+		};
+	} else {
+		const templateDataRaw = fs.readFileSync(dataPath, 'utf8');
+		const dataSerializer = new DataSerializer();
+		templateData = dataSerializer.deserialize(templateDataRaw);
+		contentStorage = readFiles(getBasePath(dataPath), templateData.meta.filePaths);
+	}
 
 	const pagesResolver = new PagesResolver();
 	const pagesDataGenerator = new PagesDataGenerator();
 	const renderer = new TemplateRenderer(false, templateStorage, contentStorage, pagesDataGenerator);
 
-	exportRelease(manifest, data.data, contentStorage, templateStorage, pagesResolver, renderer,
+	exportRelease(manifest, templateData.data, contentStorage, templateStorage, pagesResolver, renderer,
 		(filePath, contentType: ContentType, content) => {
 			const realPath = simplifyPath(outDir + filePath);
 			if (contentType === 'text') {

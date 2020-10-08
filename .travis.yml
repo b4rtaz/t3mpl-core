@@ -11,6 +11,8 @@ script:
   - npm run lint
   - npm run test:single
   - npm run build
+  - npm run boilerplate
+  - npm run boilerplate:example
 
 after_script:
   - cat ./coverage/*/lcovonly/lcov.info | ./node_modules/coveralls/bin/coveralls.js
