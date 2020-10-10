@@ -1,20 +1,16 @@
-import * as moment from 'moment';
-
+import { formatDate } from '../../utils/date-utils';
 import { TemplateHelper } from '../template-helper';
 
 export class CopyrightTemplateHelper implements TemplateHelper {
 	public name = '$copyright';
 
 	public constructor(
-		private readonly utcOffset?: number) {
+		private readonly timezone?: string) {
 	}
 
 	public execute(): string {
-		let now = moment();
-		if (this.utcOffset) {
-			now = now.zone(this.utcOffset);
-		}
-		const year = now.get('year');
+		const now = new Date();
+		const year = formatDate(now, 'YYYY', this.timezone);
 		return `<script>document.write('&copy;' + (new Date()).getFullYear());</script><noscript>&copy;${year}</noscript>`;
 	}
 }

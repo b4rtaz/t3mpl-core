@@ -1,11 +1,11 @@
 import * as jsyaml from 'js-yaml';
-import * as moment from 'moment';
 
 import {
 	BooleanPropertyContract,
 	ChoicePropertyContract,
 	ChoicePropertyContractValues,
 	CollectionPropertyContract,
+	ColorPropertyContract,
 	DataContract,
 	DateTimePropertyContract,
 	HtmlPropertyContract,
@@ -19,10 +19,10 @@ import {
 	TemplateManifest,
 	TemplateManifestMeta,
 	TextPropertyContract,
-	ZoneContractMap,
-	ColorPropertyContract
+	ZoneContractMap
 } from './model';
 import { getChoiceValuesSet, getTextValueSet } from './template-sets';
+import { dateToIsoString } from './utils/date-utils';
 
 export class TemplateManifestParser {
 
@@ -151,7 +151,7 @@ export class TemplateManifestParser {
 					required,
 					_label: label,
 					_description: descr,
-					defaultValue: dDefaultValue ? moment(dDefaultValue).toISOString(true) : null,
+					defaultValue: dDefaultValue ? dateToIsoString(dDefaultValue) : null,
 					now: !dDefaultValue ? tryReadBoolean(property, 'now', null) : null
 				};
 				map[propertyName] = dtpc;

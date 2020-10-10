@@ -1,25 +1,20 @@
-import * as moment from 'moment';
-
+import { formatDate } from '../../utils/date-utils';
 import { TemplateHelper } from '../template-helper';
 
 export class DateTimeTemplateHelper implements TemplateHelper {
 	public name = '$format_dt';
 
 	public constructor(
-		private readonly utcOffset?: number) {
+		private readonly timezone?: string) {
 	}
 
 	public execute(dataTime: string, format?: string): string {
 		if (!dataTime) {
 			return '[NULL]';
 		}
-		let date = moment(dataTime);
-		if (this.utcOffset) {
-			date = date.utcOffset(this.utcOffset);
-		}
 		if (format && typeof(format) === 'string') {
-			return date.format(format);
+			return formatDate(dataTime, format, this.timezone);
 		}
-		return date.toISOString(true);
+		return dataTime;
 	}
 }

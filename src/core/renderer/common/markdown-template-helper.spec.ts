@@ -16,4 +16,12 @@ describe('MarkdownTemplateHelper', () => {
 
 		expect(html).toEqual('[NULL]');
 	});
+
+	it ('execute() returns proper value', () => {
+		contentStorage.setContent('text', 'content/foo.md', '**bold**');
+
+		const html = helper.execute('content/foo.md');
+
+		expect(html).toContain('<p><strong>bold</strong></p>');
+	});
 });

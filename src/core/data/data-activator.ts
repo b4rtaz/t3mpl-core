@@ -1,5 +1,3 @@
-import * as moment from 'moment';
-
 import { HTML_CONTENT_BASE_PATH, HTML_CONTENT_EXT, MARKDOWN_CONTENT_BASE_PATH, MARKDOWN_CONTENT_EXT } from '../constants';
 import {
 	BooleanPropertyContract,
@@ -19,6 +17,7 @@ import {
 	ZoneContractMap
 } from '../model';
 import { ReadableStorage, WritableStorage } from '../storage';
+import { dateToIsoString } from '../utils/date-utils';
 import { generateFileName } from '../utils/file-name-generator';
 
 export class DataActivator {
@@ -79,7 +78,7 @@ export class DataActivator {
 					return dateProperty.defaultValue;
 				}
 				if (dateProperty.now) {
-					return moment().toISOString(true);
+					return dateToIsoString(new Date());
 				}
 				return null;
 

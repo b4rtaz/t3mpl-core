@@ -32,10 +32,10 @@
 	},
 	"license": "MIT",
 	"dependencies": {
+		"dayjs": "^1.9.1",
 		"handlebars": "^4.7.6",
 		"js-yaml": "^3.14.0",
-		"marked": "^1.1.1",
-		"moment": "^2.27.0"
+		"marked": "^1.1.1"
 	},
 	"devDependencies": {
 		"@types/jasmine": "^3.5.14",
