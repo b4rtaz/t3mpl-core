@@ -4,6 +4,12 @@ import { DataValidator } from './data-validator';
 
 describe('DataValidator', () => {
 
+	let validator: DataValidator;
+
+	beforeEach(() => {
+		validator = new DataValidator();
+	});
+
 	it('validate() returns proper value', () => {
 		const t = new TemplateManifestParser().parse(
 `meta:
@@ -53,7 +59,7 @@ pages:
 			}
 		};
 
-		const errors = new DataValidator().validate(t.dataContract, data);
+		const errors = validator.validate(t.dataContract, data);
 		const invalidDataPaths = Object.keys(errors);
 
 		expect(invalidDataPaths).toContain('Q.P.TITLE');
@@ -69,9 +75,21 @@ pages:
 
 		const value: string = null;
 
-		const errors = new DataValidator().validateProperty(propContract, 'A.B.C', value);
+		const errors = validator.validateProperty(propContract, 'A.B.C', value);
 		const invalidDataPaths = Object.keys(errors);
 
 		expect(invalidDataPaths).toContain('A.B.C');
+	});
+
+	it('validateProperty() throws error when property contract type is invalid', () => {
+		const contract: BooleanPropertyContract = {
+			required: true,
+			type: <any>'invalid'
+		};
+
+		const value: string = null;
+
+		expect(() => validator.validateProperty(contract, 'A.B.C', 'value'))
+			.toThrowMatching((e: Error) => e.message.startsWith('Not supported property contract type'));
 	});
 });

@@ -5,13 +5,14 @@ describe('PagesDataGenerator', () => {
 
 	it('generateData() returns proper value', () => {
 		const pages: Page[] = [
-			{ name: 'ALFA', filePath: 'alfa0.html', templateFilePath: 'alfa.html', dataPath: 'A.B.C[0]', index: 0 },
-			{ name: 'ALFA', filePath: 'alfa1.html', templateFilePath: 'alfa.html', dataPath: 'A.B.C[1]', index: 1 },
-			{ name: 'ALFA', filePath: 'alfa2.html', templateFilePath: 'alfa.html', dataPath: 'A.B.C[2]', index: 2 },
-			{ name: 'BETA', filePath: 'beta.html', templateFilePath: 'beta.html' },
+			{ name: 'ALFA', virtualFilePath: 'alfa0.html', filePath: 'alfa0.html', templateFilePath: 'alfa.html', dataPath: 'A.B.C[0]', index: 0 },
+			{ name: 'ALFA', virtualFilePath: 'alfa1.html', filePath: 'alfa1.html', templateFilePath: 'alfa.html', dataPath: 'A.B.C[1]', index: 1 },
+			{ name: 'ALFA', virtualFilePath: 'alfa2.html', filePath: 'alfa2.html', templateFilePath: 'alfa.html', dataPath: 'A.B.C[2]', index: 2 },
+			{ name: 'BETA', virtualFilePath: 'smth/beta', filePath: 'beta.html', templateFilePath: 'beta.html' },
 		];
 
-		pages.push({ name: 'ENTRIES', filePath: 'entries0.html', templateFilePath: 'entires.html', subPages: [ pages[0], pages[1] ], index: 0 });
+		pages.push({ name: 'ENTRIES', virtualFilePath: 'entries0.html', filePath: 'entries0.html', templateFilePath: 'entires.html',
+			subPages: [ pages[0], pages[1] ], index: 0 });
 
 		const data = {
 			A: {
@@ -55,7 +56,7 @@ describe('PagesDataGenerator', () => {
 		expect(alfa2.NEXT_PAGE).toBeUndefined();
 
 		const beta = d.$PAGES.BETA as PageData;
-		expect(beta.FILE_PATH).toEqual('beta.html');
+		expect(beta.FILE_PATH).toEqual('smth/beta');
 		expect(beta.DATA).toBeUndefined();
 		expect(beta.PREVIOUS_PAGE).toBeUndefined();
 		expect(beta.NEXT_PAGE).toBeUndefined();

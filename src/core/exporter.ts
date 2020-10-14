@@ -6,7 +6,7 @@ import {
 	TEMPLATE_MANIFEST_FILE_NAME
 } from './constants';
 import { DataSerializer } from './data/data-serializer';
-import { TemplateData, TemplateManifest } from './model';
+import { TemplateData, TemplateConfiguration, TemplateManifest } from './model';
 import { PagesResolver } from './pages-resolver';
 import { TemplateRenderer } from './renderer/template-renderer';
 import { ContentType, ReadableStorage } from './storage';
@@ -52,6 +52,7 @@ export function exportTemplate(templateStorage: ReadableStorage, handler: Export
 
 export function exportData(
 	templateManifest: TemplateManifest,
+	configuration: TemplateConfiguration,
 	data: any,
 	contentStorage: ReadableStorage,
 	dataSerializer: DataSerializer,
@@ -66,6 +67,7 @@ export function exportData(
 			version: templateManifest.meta.version,
 			filePaths: usedFilePaths
 		},
+		configuration,
 		data: data
 	};
 

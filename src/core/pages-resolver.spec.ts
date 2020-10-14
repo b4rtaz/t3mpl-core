@@ -1,8 +1,7 @@
-import { PageContractMap } from './model';
-import { PagesResolver } from './pages-resolver';
+import { PageContractMap, PagePathStrategy } from './model';
+import { createAbsolutePagePath, createDirectoryPagePath, PagesResolver } from './pages-resolver';
 
 describe('PagesResolver', () => {
-	const resolver = new PagesResolver();
 
 	it('resolve() returns proper value', () => {
 		const data = {
@@ -45,6 +44,7 @@ describe('PagesResolver', () => {
 			}
 		};
 
+		const resolver = new PagesResolver(PagePathStrategy.absolute);
 		const p = resolver.resolve(pages, data);
 
 		expect(p.length).toEqual(10);
@@ -83,6 +83,8 @@ describe('PagesResolver', () => {
 			}
 		};
 
+		const resolver = new PagesResolver(PagePathStrategy.absolute);
+
 		expect(() => resolver.resolve(pages, data))
 			.toThrowMatching((e: Error) => e.message === 'Unsuported data type. Collection was expected.');
 	});
@@ -112,25 +114,59 @@ describe('PagesResolver', () => {
 			}
 		};
 
+		const resolver = new PagesResolver(PagePathStrategy.directory);
 		const p = resolver.resolve(pages, data);
 
 		expect(p.length).toEqual(30 + 8);
 
 		expect(p[0].filePath).toEqual('index.html');
+		expect(p[0].virtualFilePath).toEqual('./');
 		expect(p[0].subPages.length).toEqual(4);
-		expect(p[0].subPages[0].filePath).toEqual('article-30.html');
-		expect(p[0].subPages[3].filePath).toEqual('article-27.html');
+		expect(p[0].subPages[0].filePath).toEqual('article-30/index.html');
+		expect(p[0].subPages[3].filePath).toEqual('article-27/index.html');
 
-		expect(p[1].filePath).toEqual('entries-2.html');
-		expect(p[1].subPages[0].filePath).toEqual('article-26.html');
-		expect(p[1].subPages[3].filePath).toEqual('article-23.html');
+		expect(p[1].filePath).toEqual('entries-2/index.html');
+		expect(p[1].subPages.length).toEqual(4);
+		expect(p[1].subPages[0].filePath).toEqual('article-26/index.html');
+		expect(p[1].subPages[3].filePath).toEqual('article-23/index.html');
 
-		expect(p[2].filePath).toEqual('entries-3.html');
-		expect(p[3].filePath).toEqual('entries-4.html');
+		expect(p[2].filePath).toEqual('entries-3/index.html');
+		expect(p[2].virtualFilePath).toEqual('entries-3/');
+		expect(p[3].filePath).toEqual('entries-4/index.html');
+		expect(p[3].virtualFilePath).toEqual('entries-4/');
 
-		expect(p[8].filePath).toEqual('article-30.html');
-		expect(p[9].filePath).toEqual('article-29.html');
-		expect(p[10].filePath).toEqual('article-28.html');
-		expect(p[11].filePath).toEqual('article-27.html');
+		expect(p[8].filePath).toEqual('article-30/index.html');
+		expect(p[8].virtualFilePath).toEqual('article-30/');
+		expect(p[9].filePath).toEqual('article-29/index.html');
+		expect(p[10].filePath).toEqual('article-28/index.html');
+		expect(p[11].filePath).toEqual('article-27/index.html');
+	});
+
+	it('createAbsolutePagePath() returns proper value', () => {
+		const ap1 = createAbsolutePagePath('index.html');
+		expect(ap1.filePath).toEqual('index.html');
+		expect(ap1.virutalFilePath).toEqual('index.html');
+	});
+
+	it('createDirectoriesPagePath() returns proper value', () => {
+		const pp1 = createDirectoryPagePath('article.html');
+		expect(pp1.filePath).toEqual('article/index.html');
+		expect(pp1.virutalFilePath).toEqual('article/');
+
+		const pp2 = createDirectoryPagePath('feed/rss.xml');
+		expect(pp2.filePath).toEqual('feed/rss.xml');
+		expect(pp2.virutalFilePath).toEqual('feed/rss.xml');
+
+		const pp3 = createDirectoryPagePath('rss.xml');
+		expect(pp3.filePath).toEqual('rss.xml');
+		expect(pp3.virutalFilePath).toEqual('rss.xml');
+
+		const pp4 = createDirectoryPagePath('index.html');
+		expect(pp4.filePath).toEqual('index.html');
+		expect(pp4.virutalFilePath).toEqual('./');
+
+		const pp5 = createDirectoryPagePath('directory/index.html');
+		expect(pp5.filePath).toEqual('directory/index.html');
+		expect(pp5.virutalFilePath).toEqual('directory/');
 	});
 });

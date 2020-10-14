@@ -9,6 +9,7 @@ import { TemplateData } from '../core/model';
 import { PagesResolver } from '../core/pages-resolver';
 import { TemplateRenderer } from '../core/renderer/template-renderer';
 import { ContentType } from '../core/storage';
+import { getDefaultConfiguration } from '../core/template-configuration';
 import { TemplateManifestParser } from '../core/template-manifest-parser';
 import { getBasePath, getFileExt, isTextFileExt, simplifyPath } from '../core/utils/path-utils';
 import { getArg, tryGetArg } from './node-utils';
@@ -59,7 +60,8 @@ export function build() {
 		const dataActivator = new DataActivator(templateStorage, contentStorage);
 		const data = dataActivator.createInstance(manifest.dataContract);
 		templateData = {
-			data: data,
+			data,
+			configuration: getDefaultConfiguration(),
 			meta: {
 				name: manifest.meta.name,
 				version: manifest.meta.version,
@@ -73,7 +75,7 @@ export function build() {
 		contentStorage = readFiles(getBasePath(dataPath), templateData.meta.filePaths);
 	}
 
-	const pagesResolver = new PagesResolver();
+	const pagesResolver = new PagesResolver(templateData.configuration.pagePathStrategy);
 	const pagesDataGenerator = new PagesDataGenerator();
 	const renderer = new TemplateRenderer(false, templateStorage, contentStorage, pagesDataGenerator);
 

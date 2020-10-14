@@ -1,4 +1,5 @@
 import { TemplateData } from '../model';
+import { getDefaultConfiguration } from '../template-configuration';
 
 export class DataSerializer {
 
@@ -11,6 +12,13 @@ export class DataSerializer {
 		if (!td || !td.data || !td.meta || !td.meta.filePaths) {
 			throw new Error('Cannot deserialize the template data.');
 		}
+		upgradeData(td);
 		return td;
+	}
+}
+
+function upgradeData(td: TemplateData) {
+	if (!td.configuration) {
+		td.configuration = getDefaultConfiguration();
 	}
 }

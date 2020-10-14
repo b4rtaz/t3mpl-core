@@ -61,7 +61,7 @@ export class DataValidator {
 				break;
 
 			default:
-				throw new Error(`Not supported type ${contract.type}.`);
+				throw new Error(`Not supported property contract type ${contract.type}.`);
 		}
 	}
 }

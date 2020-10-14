@@ -2,7 +2,7 @@ import { DataSerializer } from './data/data-serializer';
 import { PagesDataGenerator } from './data/pages-data-generator';
 import { exportData, exportRelease, exportTemplate } from './exporter';
 import { MemoryStorage } from './memory-storage';
-import { TemplateManifest } from './model';
+import { PagePathStrategy, TemplateConfiguration, TemplateManifest } from './model';
 import { PagesResolver } from './pages-resolver';
 import { TemplateRenderer } from './renderer/template-renderer';
 import { ContentType } from './storage';
@@ -47,11 +47,14 @@ describe('Exporter', () => {
 			},
 			pages: {}
 		};
+		const configuration: TemplateConfiguration = {
+			pagePathStrategy: PagePathStrategy.absolute
+		};
 		const data = { A: { B: { C: 1 } } };
 		const dataSerializer = new DataSerializer();
 
 		const files: { [filePath: string]: ContentType } = {};
-		exportData(manifest, data, storage, dataSerializer, (filePath, contentType, content) => {
+		exportData(manifest, configuration, data, storage, dataSerializer, (filePath, contentType, content) => {
 			expect(content).toBeDefined();
 			files[filePath] = contentType;
 		});
@@ -74,7 +77,7 @@ describe('Exporter', () => {
 		templateStorage.setContent('text', 'header.partial', '...');
 		templateStorage.setContent('text', 'content/markdown/default.md', '...');
 
-		const pagesResolver = new PagesResolver();
+		const pagesResolver = new PagesResolver(PagePathStrategy.absolute);
 		const pageDataGenerator = new PagesDataGenerator();
 		const templateRenderer = new TemplateRenderer(false, templateStorage, contentStorage, pageDataGenerator);
 

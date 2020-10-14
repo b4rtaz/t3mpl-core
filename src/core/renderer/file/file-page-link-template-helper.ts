@@ -10,8 +10,8 @@ export class FilePageLinkTemplateHelper implements TemplateHelper {
 		private readonly currentPagePath: string) {
 	}
 
-	public execute(pageFilePath: string, title: string, className?: string): string {
-		const relativeFilePath = relativize(this.currentPagePath, pageFilePath);
+	public execute(pageVirtualFilePath: string, title: string, className?: string): string {
+		const relativeFilePath = relativize(this.currentPagePath, pageVirtualFilePath);
 
 		let html = '<a href="';
 		html += Handlebars.Utils.escapeExpression(relativeFilePath);

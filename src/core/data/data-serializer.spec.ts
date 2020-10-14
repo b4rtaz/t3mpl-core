@@ -1,3 +1,4 @@
+import { PagePathStrategy } from '../model';
 import { DataSerializer } from './data-serializer';
 
 describe('DataSerializer', () => {
@@ -11,17 +12,20 @@ describe('DataSerializer', () => {
 				version: 124,
 				filePaths: [ 'data.json', 'a.jpg' ]
 			},
-			data: { A: 21356 },
+			configuration: {
+				pagePathStrategy: PagePathStrategy.absolute
+			},
+			data: { A: { B: { C: 21356 } } }
 		});
 
-		const q = ser.deserialize(s);
+		const d = ser.deserialize(s);
 
-		expect(q.data).not.toBeNull();
-		expect(q.data.A).toEqual(21356);
-		expect(q.meta.name).toContain('X');
-		expect(q.meta.version).toEqual(124);
-		expect(q.meta.filePaths).toContain('a.jpg');
-		expect(q.meta.filePaths).toContain('data.json');
+		expect(d.data).not.toBeNull();
+		expect(d.data.A.B.C).toEqual(21356);
+		expect(d.meta.name).toContain('X');
+		expect(d.meta.version).toEqual(124);
+		expect(d.meta.filePaths).toContain('a.jpg');
+		expect(d.meta.filePaths).toContain('data.json');
 	});
 
 	it('deserialize() throws error when input is invalid', () => {
@@ -31,5 +35,23 @@ describe('DataSerializer', () => {
 		expect(() => ser.deserialize('{}')).toThrowMatching(v);
 		expect(() => ser.deserialize('{"data": {}}')).toThrowMatching(v);
 		expect(() => ser.deserialize('{"meta": {}}')).toThrowMatching(v);
+	});
+
+	it('deserialize() upgrades data without configuration', () => {
+		const json = `{
+			"meta": {
+				"name": "Boilerplate",
+				"version": 1,
+				"filePaths": [ "data.json" ]
+			},
+			"data": {
+				"A": { "B": { "C": 1 } }
+			}
+		}`;
+
+		const d = ser.deserialize(json);
+
+		expect(d.configuration).toBeDefined();
+		expect(d.configuration.pagePathStrategy).toEqual(PagePathStrategy.absolute);
 	});
 });

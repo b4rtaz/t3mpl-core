@@ -80,5 +80,14 @@ describe('PathUtils', () => {
 
 		const r3 = relativize('index.html', 'assets/image.jpg');
 		expect(r3).toEqual('assets/image.jpg');
+
+		const r4 = relativize('dir/some.html', 'articles/');
+		expect(r4).toEqual('../articles/');
+
+		const r5 = relativize('index.html', './');
+		expect(r5).toEqual('./');
+
+		const r6 = relativize('index.html', 'test/');
+		expect(r6).toEqual('test/');
 	});
 });

@@ -133,7 +133,7 @@ export class DataActivator {
 				}
 
 			default:
-				throw new Error(`Not supported proeprty type: ${property.type}.`);
+				throw new Error(`Not supported property type: ${property.type}.`);
 		}
 	}
 

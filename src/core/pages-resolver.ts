@@ -1,8 +1,12 @@
 import { DataPath } from './data/data-path';
-import { Page, PageContract, PageContractMap } from './model';
-import { extendFileName, replaceFileName } from './utils/path-utils';
+import { Page, PageContract, PageContractMap, PagePathStrategy } from './model';
+import { extendFileName, getFileExt, getFilePathWithoutExt, replaceFileName } from './utils/path-utils';
 
 export class PagesResolver {
+
+	public constructor(
+		private readonly pagePathStrategy: PagePathStrategy) {
+	}
 
 	public resolve(contractMap: PageContractMap, data: any): Page[] {
 		const pages: Page[] = [];
@@ -30,9 +34,11 @@ export class PagesResolver {
 	}
 
 	private resolveSingle(pages: Page[], pageName: string, contract: PageContract) {
+		const pp = this.createPagePath(contract.filePath);
 		pages.push({
 			name: pageName,
-			filePath: contract.filePath,
+			filePath: pp.filePath,
+			virtualFilePath: pp.virutalFilePath,
 			templateFilePath: contract.templateFilePath,
 			dataPath: null,
 			index: null
@@ -59,9 +65,11 @@ export class PagesResolver {
 				filePath = extendFileName(contract.filePath, suffix);
 			}
 
+			const pp = this.createPagePath(filePath);
 			pages.push({
 				name: pageName,
-				filePath,
+				filePath: pp.filePath,
+				virtualFilePath: pp.virutalFilePath,
 				templateFilePath: contract.templateFilePath,
 				dataPath: `${contract.multiplier.dataPath}[${i}]`,
 				index: i
@@ -87,9 +95,11 @@ export class PagesResolver {
 				? contract.divider.firstFilePath
 				: extendFileName(contract.filePath, (i + 1).toString());
 
+			const pp = this.createPagePath(filePath);
 			const page: Page = {
 				name: pageName,
-				filePath,
+				filePath: pp.filePath,
+				virtualFilePath: pp.virutalFilePath,
 				templateFilePath: contract.templateFilePath,
 				subPages,
 				index: i
@@ -98,4 +108,49 @@ export class PagesResolver {
 			insertIndex++;
 		}
 	}
+
+	private createPagePath(filePath: string): PagePath {
+		switch (this.pagePathStrategy) {
+			case PagePathStrategy.absolute:
+				return createAbsolutePagePath(filePath);
+			case PagePathStrategy.directory:
+				return createDirectoryPagePath(filePath);
+			default:
+				throw new Error(`Not supported page path strategy ${this.pagePathStrategy}.`);
+		}
+	}
+}
+
+export function createAbsolutePagePath(filePath: string): PagePath {
+	return {
+		virutalFilePath: filePath,
+		filePath
+	};
+}
+
+export function createDirectoryPagePath(filePath: string): PagePath {
+	const fileExt = getFileExt(filePath);
+	if (fileExt !== '.html') {
+		return createAbsolutePagePath(filePath);
+	}
+
+	let virutalFilePath: string;
+	if (filePath.endsWith('/index.html')) {
+		virutalFilePath = filePath.substring(0, filePath.length - 'index.html'.length);
+	} else if (filePath === 'index.html') {
+		virutalFilePath = './';
+	} else {
+		const path = getFilePathWithoutExt(filePath);
+		filePath = path + '/index.html';
+		virutalFilePath = path + '/';
+	}
+	return {
+		filePath,
+		virutalFilePath
+	};
+}
+
+export interface PagePath {
+	filePath: string;
+	virutalFilePath: string;
 }

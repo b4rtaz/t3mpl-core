@@ -68,11 +68,7 @@ export class DataPath {
 		try {
 			this._find(node, pathParts, found);
 		} catch (e) {
-			if (e instanceof FindError) {
-				throw new FindError(`${e.message} (${pathParts.join('.')})`);
-			} else {
-				throw e;
-			}
+			throw new FindError(`${e.message} (${pathParts.join('.')})`);
 		}
 	}
 

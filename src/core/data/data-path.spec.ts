@@ -2,6 +2,11 @@ import { DataPath } from './data-path';
 
 describe('DataPath', () => {
 
+	it('parse() throws error when input is invalid', () => {
+		expect(() => DataPath.parse(null)).toThrowMatching((e: Error) => e.message.startsWith('Path is empty'));
+		expect(() => DataPath.parse(10 as any)).toThrowMatching((e: Error) => e.message.startsWith('Path must be a string'));
+	});
+
 	it('should set() values correctly', () => {
 		const alfa = { A: {  B: 6789 } };
 		const beta = { Z: {  X: [ { Y: 5 }, { Y: 10 }, { Y: 15 } ] } };
@@ -27,6 +32,20 @@ describe('DataPath', () => {
 		expect(v2).toEqual(10);
 		expect(v3).toEqual(15);
 		expect(v4).toEqual('foo');
+	});
+
+	it('get() throws error when path is invalid', () => {
+		const data = {
+			A: {
+				B: [
+					{ C: 1 }
+				]
+			}
+		};
+
+		expect(() => DataPath.parse('A.Q').get(data)).toThrowMatching((e: Error) => e.message.startsWith('Cannot find the path'));
+		expect(() => DataPath.parse('A[1]').get(data)).toThrowMatching((e: Error) => e.message.startsWith('Invalid path. Node is not array'));
+		expect(() => DataPath.parse('A.B[100]').get(data)).toThrowMatching((e: Error) => e.message.startsWith('Invalid array index'));
 	});
 
 	it('should unshiftItem() value correctly', () => {

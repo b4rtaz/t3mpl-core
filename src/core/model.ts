@@ -143,15 +143,26 @@ export interface CollectionPropertyContract extends PropertyContract {
 export interface Page {
 	name: string;
 	filePath: string;
+	virtualFilePath: string;
 	templateFilePath: string;
 	dataPath?: string;
 	index?: number;
 	subPages?: Page[];
 }
 
+export enum PagePathStrategy {
+	absolute = 'absolute',
+	directory = 'directory'
+}
+
 export interface TemplateData {
 	meta: TemplateDataMeta;
+	configuration: TemplateConfiguration;
 	data: any;
+}
+
+export interface TemplateConfiguration {
+	pagePathStrategy: PagePathStrategy;
 }
 
 export interface TemplateDataMeta {

@@ -1,6 +1,6 @@
 {
 	"name": "t3mpl-core",
-	"version": "0.1.3",
+	"version": "0.2.1",
 	"author": "Bartlomiej Tadych (http://n4no.com)",
 	"main": "./t3mpl.js",
 	"typings": "./t3mpl.d.ts",

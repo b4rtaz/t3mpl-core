@@ -1,7 +1,7 @@
-import { MemoryStorage } from '../memory-storage';
-import { getHelpers, getPartials, TemplateRenderer } from './template-renderer';
 import { PagesDataGenerator } from '../data/pages-data-generator';
+import { MemoryStorage } from '../memory-storage';
 import { Page } from '../model';
+import { getHelpers, getPartials, TemplateRenderer } from './template-renderer';
 
 describe('TemplateRenderer', () => {
 
@@ -46,7 +46,7 @@ describe('TemplateRenderer', () => {
 			}
 		};
 		const pages: Page[] = [
-			{ name: 'PAGE', filePath: 'page.html', templateFilePath: 'page.html' }
+			{ name: 'PAGE', virtualFilePath: 'page.html', filePath: 'page.html', templateFilePath: 'page.html' }
 		];
 
 		const html = renderer.render(pages, pages[0], data);

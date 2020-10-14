@@ -1,4 +1,5 @@
 import { MemoryStorage } from '../memory-storage';
+import { PropertyContractMap, PropertyContractType, TextPropertyContract } from '../model';
 import { TemplateManifestParser } from '../template-manifest-parser';
 import { DataActivator } from './data-activator';
 
@@ -13,7 +14,7 @@ describe('DataActivator', () => {
 	const contentStorage = new MemoryStorage();
 	const activator = new DataActivator(templateStorage, contentStorage);
 
-	it('should generate correct instance', () => {
+	it('createInstance() should generate correct instance', () => {
 		const t = parser.parse(
 `meta:
   version: 1
@@ -40,8 +41,14 @@ dataContract:
             defaultValue: Lorem
           EPSILON:
             type: (collection)
+            defaultOccurrences: 32
             properties:
               DESCR:
+                type: (text)
+          ZETA:
+            type: (collection)
+            properties:
+              X:
                 type: (text)
       TYPES:
         properties:
@@ -92,7 +99,9 @@ pages:
 		expect(instance.ALFA.BETA.GAMMA).not.toBeNull();
 		expect(instance.ALFA.BETA.GAMMA.length).toEqual(2);
 		expect(instance.ALFA.BETA.EPSILON).not.toBeNull();
-		expect(instance.ALFA.BETA.EPSILON.length).toEqual(0);
+		expect(instance.ALFA.BETA.EPSILON.length).toEqual(32);
+		expect(instance.ALFA.BETA.ZETA).not.toBeNull();
+		expect(instance.ALFA.BETA.ZETA.length).toEqual(0);
 		expect(instance.ALFA.BETA.DELTA).toEqual('Lorem');
 
 		expect(instance.ALFA.TYPES.COLOR).toEqual('#CE4848');
@@ -107,5 +116,32 @@ pages:
 		expect(instance.ALFA.TYPES.MARKDOWN_NULL).toBeNull();
 		expect(instance.ALFA.TYPES.IMAGE).toEqual('image.jpg');
 		expect(instance.ALFA.TYPES.IMAGE_NULL).toBeNull();
+	});
+
+
+	it('createPropertiesInstance() should generate correct instance', () => {
+		const map: PropertyContractMap = {
+			'A': {
+				type: PropertyContractType.text,
+				required: true,
+				defaultValue: 'test'
+			} as TextPropertyContract
+		};
+
+		const instance = activator.createPropertiesInstance(map);
+
+		expect(instance.A).toEqual('test');
+	});
+
+	it('createPropertiesInstance() throws error when property contract type is invalid', () => {
+		const map: PropertyContractMap = {
+			'B': {
+				type: <any>'unknown',
+				required: false
+			}
+		};
+
+		expect(() => activator.createPropertiesInstance(map))
+			.toThrowMatching((e: Error) => e.message.startsWith('Not supported property type'));
 	});
 });

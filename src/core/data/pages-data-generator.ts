@@ -12,7 +12,7 @@ export class PagesDataGenerator {
 			const isCurrentPage: boolean = (page.filePath === currentPage.filePath);
 			const pageData: PageData = {
 				IS_CURRENT: isCurrentPage,
-				FILE_PATH: page.filePath
+				FILE_PATH: page.virtualFilePath
 			};
 			if (page.dataPath) {
 				let pageDataItems: PageData[] = pageDataMap[page.name] as PageData[];
@@ -46,7 +46,7 @@ export class PagesDataGenerator {
 			const pageDataItems = pageDataMap[pageName] as PageData[];
 
 			p.row.$SUB_PAGES = pageDataItems.filter(i => {
-				return p.subPages.find(sp => sp.filePath === i.FILE_PATH);
+				return p.subPages.find(sp => sp.virtualFilePath === i.FILE_PATH);
 			});
 		}
 
@@ -81,7 +81,7 @@ export interface PageDataMap {
 }
 
 export interface PageData {
-	FILE_PATH: string;
+	FILE_PATH: string; // TODO: this property has wrong name, it should be VIRTUAL_FILE_PATH.
 	IS_CURRENT: boolean;
 
 	// multiplier + divider
