@@ -1,6 +1,7 @@
 import { DataPath } from './data/data-path';
 import { Page, PageContract, PageContractMap, PagePathStrategy } from './model';
-import { extendFileName, getFileExt, getFilePathWithoutExt, replaceFileName } from './utils/path-utils';
+import { PagePath } from './page-path';
+import { extendFileName, replaceFileName } from './utils/path-utils';
 
 export class PagesResolver {
 
@@ -112,45 +113,11 @@ export class PagesResolver {
 	private createPagePath(filePath: string): PagePath {
 		switch (this.pagePathStrategy) {
 			case PagePathStrategy.absolute:
-				return createAbsolutePagePath(filePath);
+				return PagePath.createAbsolute(filePath);
 			case PagePathStrategy.directory:
-				return createDirectoryPagePath(filePath);
+				return PagePath.createDirectory(filePath);
 			default:
-				throw new Error(`Not supported page path strategy ${this.pagePathStrategy}.`);
+				throw new Error(`Not supported page path strategy: ${this.pagePathStrategy}.`);
 		}
 	}
-}
-
-export function createAbsolutePagePath(filePath: string): PagePath {
-	return {
-		virutalFilePath: filePath,
-		filePath
-	};
-}
-
-export function createDirectoryPagePath(filePath: string): PagePath {
-	const fileExt = getFileExt(filePath);
-	if (fileExt !== '.html') {
-		return createAbsolutePagePath(filePath);
-	}
-
-	let virutalFilePath: string;
-	if (filePath.endsWith('/index.html')) {
-		virutalFilePath = filePath.substring(0, filePath.length - 'index.html'.length);
-	} else if (filePath === 'index.html') {
-		virutalFilePath = './';
-	} else {
-		const path = getFilePathWithoutExt(filePath);
-		filePath = path + '/index.html';
-		virutalFilePath = path + '/';
-	}
-	return {
-		filePath,
-		virutalFilePath
-	};
-}
-
-export interface PagePath {
-	filePath: string;
-	virutalFilePath: string;
 }

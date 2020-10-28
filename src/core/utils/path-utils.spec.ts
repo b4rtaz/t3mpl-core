@@ -89,5 +89,8 @@ describe('PathUtils', () => {
 
 		const r6 = relativize('index.html', 'test/');
 		expect(r6).toEqual('test/');
+
+		const r7 = relativize('test/', './');
+		expect(r7).toEqual('../');
 	});
 });

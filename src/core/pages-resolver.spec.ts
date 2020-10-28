@@ -1,5 +1,5 @@
 import { PageContractMap, PagePathStrategy } from './model';
-import { createAbsolutePagePath, createDirectoryPagePath, PagesResolver } from './pages-resolver';
+import { PagesResolver } from './pages-resolver';
 
 describe('PagesResolver', () => {
 
@@ -142,31 +142,19 @@ describe('PagesResolver', () => {
 		expect(p[11].filePath).toEqual('article-27/index.html');
 	});
 
-	it('createAbsolutePagePath() returns proper value', () => {
-		const ap1 = createAbsolutePagePath('index.html');
-		expect(ap1.filePath).toEqual('index.html');
-		expect(ap1.virutalFilePath).toEqual('index.html');
-	});
+	it('resolve() throws error when path strategy is not supported', () => {
+		const data = { A: { B: { C: [] } }};
 
-	it('createDirectoriesPagePath() returns proper value', () => {
-		const pp1 = createDirectoryPagePath('article.html');
-		expect(pp1.filePath).toEqual('article/index.html');
-		expect(pp1.virutalFilePath).toEqual('article/');
+		const pages: PageContractMap = {
+			INDEX: {
+				filePath: 'index.html',
+				templateFilePath: 'index.html'
+			}
+		};
 
-		const pp2 = createDirectoryPagePath('feed/rss.xml');
-		expect(pp2.filePath).toEqual('feed/rss.xml');
-		expect(pp2.virutalFilePath).toEqual('feed/rss.xml');
+		const resolver = new PagesResolver(<any>'NOT_SUPPORTED_PATH_STRATEGY');
 
-		const pp3 = createDirectoryPagePath('rss.xml');
-		expect(pp3.filePath).toEqual('rss.xml');
-		expect(pp3.virutalFilePath).toEqual('rss.xml');
-
-		const pp4 = createDirectoryPagePath('index.html');
-		expect(pp4.filePath).toEqual('index.html');
-		expect(pp4.virutalFilePath).toEqual('./');
-
-		const pp5 = createDirectoryPagePath('directory/index.html');
-		expect(pp5.filePath).toEqual('directory/index.html');
-		expect(pp5.virutalFilePath).toEqual('directory/');
+		expect(() => resolver.resolve(pages, data))
+			.toThrowMatching((e: Error) => e.message.startsWith('Not supported page path strategy'));
 	});
 });

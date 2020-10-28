@@ -10,6 +10,9 @@
             "assets/og-image.png"
         ]
     },
+    "configuration": {
+        "pagePathStrategy": "directory"
+    },
     "data": {
         "PAGES": {
             "PAGES": {

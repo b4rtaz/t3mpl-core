@@ -28,7 +28,7 @@ describe('TemplateSets', () => {
 
 		setNames.forEach(name => {
 			const value = getTextValueSet(name);
-			expect(value).toMatch(/^[^\s].*[^\s]$/);
+			expect(value.length).toEqual(value.trim().length);
 		});
 	});
 

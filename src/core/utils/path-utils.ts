@@ -68,7 +68,9 @@ export function simplifyPath(filePath: string): string {
 
 export function relativize(targetFilePath: string, assetFilePath: string): string {
 	const parts = targetFilePath.split('/');
-	parts.splice(parts.length - 1, 1);
+	parts.splice(parts.length - 1, 1); // It removes current directory or file name.
+
 	const base = parts.map(() => '../').join('');
-	return base + assetFilePath;
+
+	return (base + assetFilePath).replace(/\/\.\//g, '/');
 }
