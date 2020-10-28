@@ -16,7 +16,7 @@ export class PagePath {
 		if (fileExt !== '.html') {
 			return PagePath.createAbsolute(filePath);
 		}
-	
+
 		let virutalFilePath: string;
 		if (filePath.endsWith('/index.html')) {
 			virutalFilePath = filePath.substring(0, filePath.length - 'index.html'.length);
