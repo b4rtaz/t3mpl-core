@@ -15,4 +15,4 @@ export const HTML_CONTENT_EXT = '.h';
 export const MARKDOWN_CONTENT_EXT = '.md';
 
 export const PROJECT_WEBSITE_URL = 'https://t3mpl.n4no.com/';
-export const PROJECT_DONATE_URL = 'https://t3mpl.n4no.com/donate.html';
+export const PROJECT_DONATE_URL = 'https://t3mpl.n4no.com/donate/';
