@@ -28,7 +28,7 @@ export class DataValidator {
 	}
 
 	private _validateProperty(contract: PropertyContract, dataPath: string, value: any, errors: ValidationErrors) {
-		if (contract.required && value === null) {
+		if (contract.required && (value === null || value === undefined)) {
 			errors[dataPath] = 'Value is empty.';
 		}
 
@@ -50,8 +50,7 @@ export class DataValidator {
 					errors[dataPath] = 'Wrong number of occurrences.';
 				}
 				for (let i = 0; i < items.length; i++) {
-					const item = items[i];
-					for (const propertyName of Object.keys(item)) {
+					for (const propertyName of Object.keys(cpc.properties)) {
 						const propertyContract = cpc.properties[propertyName];
 						const propDataPath = `${dataPath}[${i}].${propertyName}`;
 						const itemValue = value[i][propertyName];

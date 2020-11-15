@@ -8,6 +8,7 @@ export interface ReadableStorage {
 
 export interface WritableStorage extends ReadableStorage {
 	setContent(contentType: ContentType, filePath: string, data: string): void;
+	remove(contentType: ContentType | ContentType[], filePath: string): void;
 }
 
 export type ContentType = 'text' | 'dataUrl' | 'binary';

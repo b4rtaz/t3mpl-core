@@ -52,13 +52,23 @@ describe('MemoryStorage', () => {
 			.toThrowMatching((e: Error) => e.message.startsWith('Previous file has diffrent content type'));
 	});
 
-	it('getContent() throws error when cannot file the file', () => {
-		expect(() => storage.getContent('text', 'unknown.json'))
-			.toThrowMatching((e: Error) => e.message.startsWith('Cannot find the file'));
+	it('remove() removes correctly', () => {
+		expect(storage.has('text', 'test.jpg')).toBeFalse();
+
+		storage.setContent('text', 'test.jpg', '<>');
+
+		expect(storage.has('text', 'test.jpg')).toBeTrue();
+
+		storage.remove('text', 'test.jpg');
+
+		expect(storage.has('text', 'test.jpg')).toBeFalse();
 	});
 
-	it('getEntry() throws error when cannot file the file', () => {
-		expect(() => storage.getEntry('text', 'unknown.json'))
-			.toThrowMatching((e: Error) => e.message.startsWith('Cannot find the file'));
+	it('getContent() / getEntry() / delete() throws error when cannot file the file', () => {
+		const e = (err: Error) => err.message.startsWith('Cannot find the file');
+
+		expect(() => storage.getContent('text', 'unknown.json')).toThrowMatching(e);
+		expect(() => storage.getEntry('text', 'unknown.json')).toThrowMatching(e);
+		expect(() => storage.remove('text', 'unknown.json')).toThrowMatching(e);
 	});
 });

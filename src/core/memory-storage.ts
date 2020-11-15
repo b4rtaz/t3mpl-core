@@ -15,6 +15,13 @@ export class MemoryStorage implements ReadableStorage, WritableStorage {
 		};
 	}
 
+	public remove(contentType: ContentType | ContentType[], filePath: string) {
+		if (!this.has(contentType, filePath)) {
+			throw new Error(`Cannot find the file ${filePath}.`);
+		}
+		delete this.entries[filePath];
+	}
+
 	public has(contentType: ContentType | ContentType[], filePath: string): boolean {
 		return !!this.tryGet(contentType, filePath);
 	}

@@ -36,6 +36,8 @@ dataContract:
             properties:
               DESCR:
                 type: (text)
+              PREAMBLE:
+                type: (text)
           TITLE:
             type: (text)
 
@@ -52,7 +54,10 @@ pages:
 						{ LABEL: 'x' }
 					],
 					COLL_MAX: [
-						{ DESCR: null }
+						{
+							DESCR: null,
+							// PREAMBLE is NOT defined here purposely
+						}
 					],
 					TITLE: null
 				}
@@ -65,6 +70,7 @@ pages:
 		expect(invalidDataPaths).toContain('Q.P.TITLE');
 		expect(invalidDataPaths).toContain('Q.P.COLL_MIN');
 		expect(invalidDataPaths).toContain('Q.P.COLL_MAX[0].DESCR');
+		expect(invalidDataPaths).toContain('Q.P.COLL_MAX[0].PREAMBLE');
 	});
 
 	it('validateProperty() returns proper value', () => {

@@ -9,15 +9,8 @@ import {
 import { TemplateManifestParser, transformToLabel, validFilePath, validPropertyName } from './template-manifest-parser';
 
 describe('TemplateManifestParser', () => {
-	const parser = new TemplateManifestParser();
 
-	it('parse() throws error when input is empty', () => {
-		expect(() => parser.parse(''))
-			.toThrowMatching((e: Error) => e.message.startsWith('The input is empty'));
-	});
-
-	it('should parse an example as expected', () => {
-		const t = parser.parse(
+	const header =
 `meta:
   version: 123
   name: Example
@@ -29,7 +22,18 @@ describe('TemplateManifestParser', () => {
     - index.html
     - test.js
 
-dataContract:
+`;
+
+	const parser = new TemplateManifestParser();
+
+	it('parse() throws error when input is empty', () => {
+		expect(() => parser.parse(''))
+			.toThrowMatching((e: Error) => e.message.startsWith('The input is empty'));
+	});
+
+	it('should parse an example as expected', () => {
+		const t = parser.parse(header +
+`dataContract:
   ALFA:
     _label: Alfa
     sections:
@@ -144,6 +148,62 @@ pages:
 		expect(color.type).toEqual(PropertyContractType.color);
 		expect(color._label).toEqual('Color');
 		expect(color.defaultValue).toEqual('#CE4848');
+	});
+
+	it('parse() throws error when (choice) does not have values', () => {
+		const manifest = header +
+`dataContract:
+  ALFA:
+    sections:
+      BETA:
+        properties:
+          GAMMA:
+            type: (choice)
+pages:
+  INDEX:
+    filePath: index.html
+    templateFilePath: index.html
+`;
+		expect(() => parser.parse(manifest))
+			.toThrowMatching((e: Error) => e.message === '(choice) does not have values.');
+	});
+
+	it('parse() throws error when (choice) has value which does not exist in values', () => {
+		const manifest = header +
+`dataContract:
+  ALFA:
+    sections:
+      BETA:
+        properties:
+          GAMMA:
+            type: (choice)
+            values: [alfa, beta, gamma]
+            defaultValue: epsilon
+pages:
+  INDEX:
+    filePath: index.html
+    templateFilePath: index.html
+`;
+		expect(() => parser.parse(manifest))
+			.toThrowMatching((e: Error) => e.message === 'The default value must be included in values.');
+	});
+
+	it('parse() throws error property type is undefined', () => {
+		const manifest = header +
+`dataContract:
+  ALFA:
+    sections:
+      BETA:
+        properties:
+          GAMMA:
+            type: (someUnknowType)
+pages:
+  INDEX:
+    filePath: index.html
+    templateFilePath: index.html
+`;
+		expect(() => parser.parse(manifest))
+			.toThrowMatching((e: Error) => e.message === 'The type (someUnknowType) is not supported.');
 	});
 
 	it('validPropertyName() valids correctly', () => {

@@ -1,6 +1,6 @@
 # T3MPL Core
 
-[![Build Status](https://travis-ci.org/b4rtaz/t3mpl-core.svg?branch=master)](https://travis-ci.org/b4rtaz/t3mpl-core) [![Coverage Status](https://coveralls.io/repos/github/b4rtaz/t3mpl-core/badge.svg?branch=master)](https://coveralls.io/github/b4rtaz/t3mpl-core?branch=master) [![License: MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](/LICENSE) [![Twitter: b4rtaz](https://img.shields.io/twitter/follow/b4rtaz.svg?style=social)](https://twitter.com/b4rtaz)
+[![Build Status](https://travis-ci.com/b4rtaz/t3mpl-core.svg?branch=master)](https://travis-ci.com/b4rtaz/t3mpl-core) [![Coverage Status](https://coveralls.io/repos/github/b4rtaz/t3mpl-core/badge.svg?branch=master)](https://coveralls.io/github/b4rtaz/t3mpl-core?branch=master) [![License: MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](/LICENSE) [![Twitter: b4rtaz](https://img.shields.io/twitter/follow/b4rtaz.svg?style=social)](https://twitter.com/b4rtaz)
 
 T3MPL is the core library of [T3MPL Editor](https://github.com/b4rtaz/t3mpl-editor). This project contains the template YAML parser and the template generator. The generator can be used in the browser or by command line (by Nodejs).
 

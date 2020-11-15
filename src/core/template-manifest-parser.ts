@@ -21,6 +21,7 @@ import {
 	TextPropertyContract,
 	ZoneContractMap
 } from './model';
+import { PropertyReader as PR } from './property-reader';
 import { getChoiceValuesSet, getTextValueSet } from './template-sets';
 import { dateToIsoString } from './utils/date-utils';
 
@@ -34,25 +35,25 @@ export class TemplateManifestParser {
 		const yaml = jsyaml.load(data);
 
 		const template: TemplateManifest = {
-			meta: this.parseMeta(readObject(yaml, 'meta')),
-			dataContract: this.parseDataContract(readObject(yaml, 'dataContract')),
-			pages: this.parsePages(readObject(yaml, 'pages'))
+			meta: this.parseMeta(PR.readObject(yaml, 'meta')),
+			dataContract: this.parseDataContract(PR.readObject(yaml, 'dataContract')),
+			pages: this.parsePages(PR.readObject(yaml, 'pages'))
 		};
 		return template;
 	}
 
 	private parseMeta(template: any): TemplateManifestMeta {
-		const filePaths = tryReadStringArray(template, 'filePaths');
+		const filePaths = PR.tryReadStringArray(template, 'filePaths');
 		filePaths.forEach(path => validFilePath(path));
 
 		return {
-			version: tryReadNumber(template, 'version', -1),
-			name: readString(template, 'name'),
-			author: readString(template, 'author'),
-			license: readString(template, 'license'),
-			exportable: tryReadBoolean(template, 'exportable', true),
-			homepageUrl: tryReadString(template, 'homepageUrl', null),
-			donationUrl: tryReadString(template, 'donationUrl', null),
+			version: PR.tryReadNumber(template, 'version', -1),
+			name: PR.readString(template, 'name'),
+			author: PR.readString(template, 'author'),
+			license: PR.readString(template, 'license'),
+			exportable: PR.tryReadBoolean(template, 'exportable', true),
+			homepageUrl: PR.tryReadString(template, 'homepageUrl', null),
+			donationUrl: PR.tryReadString(template, 'donationUrl', null),
 			filePaths
 		};
 	}
@@ -68,12 +69,12 @@ export class TemplateManifestParser {
 
 		for (const zoneName of Object.keys(zones)) {
 			const zone = zones[zoneName];
-			const sections = readObject(zone, 'sections');
+			const sections = PR.readObject(zone, 'sections');
 			validPropertyName(zoneName);
 
 			map[zoneName] = {
 				_label: this.readLabel(zone, zoneName),
-				_description: tryReadString(zone, '_description', null),
+				_description: PR.tryReadString(zone, '_description', null),
 				sections: this.parseSections(sections)
 			};
 		}
@@ -88,8 +89,8 @@ export class TemplateManifestParser {
 
 			map[sectionName] = {
 				_label: this.readLabel(section, sectionName),
-				_description: tryReadString(section, '_description', null),
-				_panel: tryReadString(section, '_panel', null),
+				_description: PR.tryReadString(section, '_description', null),
+				_panel: PR.tryReadString(section, '_panel', null),
 				properties: this.parseProperties(section.properties)
 			};
 		}
@@ -107,16 +108,16 @@ export class TemplateManifestParser {
 	}
 
 	private parserProperty(propertyName: string, property: any, map: PropertyContractMap) {
-		const type = readString(property, 'type');
-		const required = tryReadBoolean(property, 'required', true);
+		const type = PR.readString(property, 'type');
+		const required = PR.tryReadBoolean(property, 'required', true);
 		const label = this.readLabel(property, propertyName);
-		const descr = tryReadString(property, '_description', null);
+		const descr = PR.tryReadString(property, '_description', null);
 
 		switch (type) {
 			case '(text)':
-				let tDefaultValue = tryReadString(property, 'defaultValue', null);
+				let tDefaultValue = PR.tryReadString(property, 'defaultValue', null);
 				if (!tDefaultValue) {
-					const tDefaultValueSet = tryReadString(property, 'defaultValueSet', null);
+					const tDefaultValueSet = PR.tryReadString(property, 'defaultValueSet', null);
 					if (tDefaultValueSet) {
 						tDefaultValue = getTextValueSet(tDefaultValueSet);
 					}
@@ -128,7 +129,7 @@ export class TemplateManifestParser {
 					_label: label,
 					_description: descr,
 					defaultValue: tDefaultValue,
-					maxLength: tryReadNumber(property, 'maxLength', null)
+					maxLength: PR.tryReadNumber(property, 'maxLength', null)
 				};
 				map[propertyName] = tps;
 				break;
@@ -139,26 +140,26 @@ export class TemplateManifestParser {
 					required,
 					_label: label,
 					_description: descr,
-					defaultValue: tryReadBoolean(property, 'defaultValue', null)
+					defaultValue: PR.tryReadBoolean(property, 'defaultValue', null)
 				};
 				map[propertyName] = bpc;
 				break;
 
 			case '(dateTime)':
-				const dDefaultValue = tryReadDate(property, 'defaultValue', null);
+				const dDefaultValue = PR.tryReadDate(property, 'defaultValue', null);
 				const dtpc: DateTimePropertyContract = {
 					type: PropertyContractType.dateTime,
 					required,
 					_label: label,
 					_description: descr,
 					defaultValue: dDefaultValue ? dateToIsoString(dDefaultValue) : null,
-					now: !dDefaultValue ? tryReadBoolean(property, 'now', null) : null
+					now: !dDefaultValue ? PR.tryReadBoolean(property, 'now', null) : null
 				};
 				map[propertyName] = dtpc;
 				break;
 
 			case '(html)':
-				const hFefaultFilePath = tryReadString(property, 'defaultFilePath', null);
+				const hFefaultFilePath = PR.tryReadString(property, 'defaultFilePath', null);
 				if (hFefaultFilePath) {
 					validFilePath(hFefaultFilePath);
 				}
@@ -174,7 +175,7 @@ export class TemplateManifestParser {
 				break;
 
 			case '(markdown)':
-				const mdFefaultFilePath = tryReadString(property, 'defaultFilePath', null);
+				const mdFefaultFilePath = PR.tryReadString(property, 'defaultFilePath', null);
 				if (mdFefaultFilePath) {
 					validFilePath(mdFefaultFilePath);
 				}
@@ -190,7 +191,7 @@ export class TemplateManifestParser {
 				break;
 
 			case '(image)':
-				const iDefaultFilePath = tryReadString(property, 'defaultFilePath', null);
+				const iDefaultFilePath = PR.tryReadString(property, 'defaultFilePath', null);
 				if (iDefaultFilePath) {
 					validFilePath(iDefaultFilePath);
 				}
@@ -200,8 +201,8 @@ export class TemplateManifestParser {
 					required,
 					_label: label,
 					_description: descr,
-					width: tryReadNumber(property, 'width', null),
-					height: tryReadNumber(property, 'height', null),
+					width: PR.tryReadNumber(property, 'width', null),
+					height: PR.tryReadNumber(property, 'height', null),
 					defaultFilePath: iDefaultFilePath,
 					images: property._images
 				};
@@ -211,20 +212,20 @@ export class TemplateManifestParser {
 			case '(choice)':
 				let choices: ChoicePropertyContractValues = null;
 
-				const values = tryReadStringArray(property, 'values');
+				const values = PR.tryReadStringArray(property, 'values');
 				if (values) {
 					choices = this.parseChoiceValues(values);
 				} else {
-					const valuesSet = tryReadString(property, 'valuesSet', null);
+					const valuesSet = PR.tryReadString(property, 'valuesSet', null);
 					if (valuesSet) {
 						choices = getChoiceValuesSet(valuesSet);
 					}
 				}
 				if (!choices) {
-					throw new Error(`TextChoice property does not have defined values.`);
+					throw new Error(`(choice) does not have values.`);
 				}
 
-				const cDefaultValue = tryReadString(property, 'defaultValue', null);
+				const cDefaultValue = PR.tryReadString(property, 'defaultValue', null);
 				if (cDefaultValue && !Object.keys(choices).includes(cDefaultValue)) {
 					throw new Error('The default value must be included in values.');
 				}
@@ -245,21 +246,21 @@ export class TemplateManifestParser {
 					required,
 					_label: label,
 					_description: descr,
-					defaultValue: tryReadString(property, 'defaultValue', null)
+					defaultValue: PR.tryReadString(property, 'defaultValue', null)
 				};
 				map[propertyName] = cpc;
 				break;
 
 			case '(collection)':
-				const cProperties = readObject(property, 'properties');
+				const cProperties = PR.readObject(property, 'properties');
 				const cps: CollectionPropertyContract = {
 					type: PropertyContractType.collection,
 					required,
 					_label: label,
 					_description: descr,
-					min: tryReadNumber(property, 'min', null),
-					max: tryReadNumber(property, 'max', null),
-					defaultOccurrences: tryReadNumber(property, 'defaultOccurrences', null),
+					min: PR.tryReadNumber(property, 'min', null),
+					max: PR.tryReadNumber(property, 'max', null),
+					defaultOccurrences: PR.tryReadNumber(property, 'defaultOccurrences', null),
 					properties: this.parseProperties(cProperties)
 				};
 				map[propertyName] = cps;
@@ -292,8 +293,8 @@ export class TemplateManifestParser {
 			const page = pages[pageName];
 			validPropertyName(pageName);
 
-			const filePath = readString(page, 'filePath');
-			const templateFilePath = readString(page, 'templateFilePath');
+			const filePath = PR.readString(page, 'filePath');
+			const templateFilePath = PR.readString(page, 'templateFilePath');
 			validFilePath(filePath);
 			validFilePath(templateFilePath);
 
@@ -303,15 +304,15 @@ export class TemplateManifestParser {
 			};
 			if (page.multiplier) {
 				contract.multiplier = {
-					dataPath: readString(page.multiplier, 'dataPath'),
-					fileNameDataPath: tryReadString(page.multiplier, 'fileNameDataPath', null)
+					dataPath: PR.readString(page.multiplier, 'dataPath'),
+					fileNameDataPath: PR.tryReadString(page.multiplier, 'fileNameDataPath', null)
 				};
 			}
 			if (page.divider) {
 				contract.divider = {
-					divisor: tryReadNumber(page.divider, 'divisor', 3),
-					pageName: readString(page.divider, 'pageName'),
-					firstFilePath: tryReadString(page.divider, 'firstFilePath', null)
+					divisor: PR.tryReadNumber(page.divider, 'divisor', 3),
+					pageName: PR.readString(page.divider, 'pageName'),
+					firstFilePath: PR.tryReadString(page.divider, 'firstFilePath', null)
 				};
 			}
 			map[pageName] = contract;
@@ -320,7 +321,7 @@ export class TemplateManifestParser {
 	}
 
 	private readLabel(data: any, fieldName: string) {
-		const label = tryReadString(data, '_label', null);
+		const label = PR.tryReadString(data, '_label', null);
 		return label ? label : transformToLabel(fieldName);
 	}
 }
@@ -342,61 +343,4 @@ export function transformToLabel(fieldName: string): string {
 		const lower = word.toLowerCase();
 		return lower.charAt(0).toUpperCase() + lower.slice(1);
 	}).join(' ');
-}
-
-function tryRead<T>(data: any, key: string, type: string, defaultValue: T) {
-	const value = data[key];
-	if (value !== undefined) {
-		if (typeof value !== type) {
-			throw new Error(`Invalid value for the key ${key}. Got ${typeof(value)}, expected ${type}.`);
-		}
-		return value;
-	}
-	return defaultValue;
-}
-
-function readObject(data: any, key: string): any {
-	const value = tryRead(data, key, 'object', null);
-	if (value === null) {
-		throw new Error(`The property ${key} does not exist.`);
-	}
-	return value;
-}
-
-function readString(data: any, key: string): string {
-	const value = tryReadString(data, key, null);
-	if (!value) {
-		throw new Error(`The property ${key} does not exist.`);
-	}
-	return value;
-}
-
-function tryReadStringArray(data: any, key: string): string[] {
-	const arr = tryRead(data, key, 'object', null) as string[];
-	if (arr !== null) {
-		if (!Array.isArray(arr) || arr.find(i => typeof i !== 'string')) {
-			throw new Error(`The property ${key} does not contain an array of strings.`);
-		}
-		return arr;
-	}
-}
-
-function tryReadString(data: any, key: string, defaultValue: string): string {
-	return tryRead(data, key, 'string', defaultValue);
-}
-
-function tryReadBoolean(data: any, key: string, defaultValue: boolean): boolean {
-	return tryRead(data, key, 'boolean', defaultValue);
-}
-
-function tryReadNumber(data: any, key: string, defaultValue: number): number {
-	return tryRead(data, key, 'number', defaultValue);
-}
-
-function tryReadDate(data: any, key: string, defaultValue: number): Date {
-	const value = tryRead(data, key, 'object', defaultValue);
-	if (value !== null && !(value instanceof Date)) {
-		throw new Error(`The property ${key} does not contain a date.`);
-	}
-	return value;
 }

@@ -3,7 +3,8 @@ import * as fs from 'fs';
 import { DataActivator } from '../core/data/data-activator';
 import { DataSerializer } from '../core/data/data-serializer';
 import { PagesDataGenerator } from '../core/data/pages-data-generator';
-import { exportRelease } from '../core/exporter';
+import { UsedFilesScanner } from '../core/data/used-files-scanner';
+import { Exporter } from '../core/exporter';
 import { MemoryStorage } from '../core/memory-storage';
 import { TemplateData } from '../core/model';
 import { PagesResolver } from '../core/pages-resolver';
@@ -78,8 +79,9 @@ export function build() {
 	const pagesResolver = new PagesResolver(templateData.configuration.pagePathStrategy);
 	const pagesDataGenerator = new PagesDataGenerator();
 	const renderer = new TemplateRenderer(false, templateStorage, contentStorage, pagesDataGenerator);
+	const usedFilesScanner = new UsedFilesScanner(contentStorage);
 
-	exportRelease(manifest, templateData.data, contentStorage, templateStorage, pagesResolver, renderer,
+	Exporter.exportRelease(manifest, templateData.data, contentStorage, templateStorage, pagesResolver, renderer, usedFilesScanner,
 		(filePath, contentType: ContentType, content) => {
 			const realPath = simplifyPath(outDir + filePath);
 			if (contentType === 'text') {
