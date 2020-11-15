@@ -21,6 +21,7 @@ import { InlineCssTemplateHelper } from './inline/inline-css-template-helper';
 import { InlineImageTemplateHelper } from './inline/inline-image-template-helper';
 import { InlinePageLinkTemplateHelper } from './inline/inline-page-link-template-helper';
 import { InlineScriptTemplateHelper } from './inline/inline-script-templat-helper';
+import { MarkdownRenderer } from './markdown-renderer';
 
 export class TemplateRenderer {
 
@@ -82,9 +83,11 @@ export function getHelpers(inline: boolean, currentPagePath: string,
 		helpers.push(new FilePageLinkTemplateHelper(currentPagePath));
 	}
 
+	const markdownRenderer = new MarkdownRenderer(inline, contentStorage);
+	helpers.push(new MarkdownTemplateHelper(markdownRenderer));
+	helpers.push(new MarkdownExcerptTemplateHelper(markdownRenderer));
+
 	helpers.push(new HtmlTemplateHelper(contentStorage));
-	helpers.push(new MarkdownTemplateHelper(contentStorage));
-	helpers.push(new MarkdownExcerptTemplateHelper(contentStorage));
 	helpers.push(new DateTimeTemplateHelper(null)); // TODO: utfOffset should come from project settings.
 	helpers.push(new CopyrightTemplateHelper(null)); // TODO: ^
 

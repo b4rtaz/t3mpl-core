@@ -96,7 +96,7 @@ export class UsedFilesScanner {
 	}
 
 	private scanHtml(html: string, usedFilePaths: string[]) {
-		const regexp = new RegExp(/<\s*img[^>]*src="([^"]+)"[^>]*>/gi);
+		const regexp = new RegExp(/<\s*img[^>]*src=["']([^"']+)["'][^>]*>/gi);
 		let result: RegExpExecArray;
 		do {
 			result = regexp.exec(html);

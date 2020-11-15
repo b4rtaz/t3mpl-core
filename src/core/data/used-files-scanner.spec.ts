@@ -70,6 +70,7 @@ pages:
 <p>
 	<img src="content/image/md-beta.jpg" width="100" height="200" />
 	<span><IMG ALT="EXAMPLE" SRC="content/image/md-gamma.jpg" /></span>
+	<img src='content/image/md-delta.gif'>
 	<img src="http://some.com/image.jpg">
 </p>`);
 
@@ -83,6 +84,7 @@ pages:
 			expect(p).toContain('content/image/md-alfa.jpg');
 			expect(p).toContain('content/image/md-beta.jpg');
 			expect(p).toContain('content/image/md-gamma.jpg');
+			expect(p).toContain('content/image/md-delta.gif');
 			expect(p).not.toContain('http://some.com/image.jpg');
 		});
 });
