@@ -20,17 +20,17 @@ dataContract:
         properties:
           IMAGE:
             type: (image)
-          HTML:
-            type: (html)
-          MD:
-            type: (markdown)
           COLL:
             type: (collection)
             properties:
-              TEXT:
-                type: (text)
+              HTML:
+                type: (html)
+                required: false
               THUMBNAIL:
                 type: (image)
+                required: false
+              MD:
+                type: (markdown)
                 required: false
 pages:
   INDEX:
@@ -42,16 +42,16 @@ pages:
 				X: {
 					Y: {
 						IMAGE: 'content/image/image.jpg',
-						HTML: 'content/html/html.html',
-						MD: 'content/markdown/md.md',
 						COLL: [
 							{
-								TEXT: 'foo',
-								THUMBNAIL: 'content/image/thumbnail.jpg'
+								HTML: null,
+								THUMBNAIL: 'content/image/thumbnail.jpg',
+								MD: 'content/markdown/md.md'
 							},
 							{
-								TEXT: 'bar',
-								THUMBNAIL: null
+								HTML: 'content/html/html.html',
+								THUMBNAIL: null,
+								MD: null
 							}
 						]
 					}

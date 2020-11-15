@@ -75,17 +75,21 @@ export class DataPath {
 	private _find(node: any, pathParts: string[], found: FoundHandler) {
 		const key = pathParts[0];
 
-		if (typeof key === 'string') {
-			if (!Object.keys(node).includes(key)) {
-				throw new FindError('Cannot find the path: ' + pathParts.join('.'));
-			}
-		} else if (typeof key === 'number') {
-			if (!Array.isArray(node)) {
-				throw new FindError('Invalid path. Node is not array.');
-			}
-			if ((node as any[]).length <= key) {
-				throw new FindError('Invalid array index: ' + key);
-			}
+		switch (typeof key) {
+			case 'string':
+				if (!Object.keys(node).includes(key)) {
+					throw new FindError('Cannot find the path: ' + pathParts.join('.'));
+				}
+				break;
+
+			case 'number':
+				if (!Array.isArray(node)) {
+					throw new FindError('Invalid path. Node is not array.');
+				}
+				if ((node as any[]).length <= key) {
+					throw new FindError('Invalid array index: ' + key);
+				}
+				break;
 		}
 
 		if (pathParts.length === 1) {

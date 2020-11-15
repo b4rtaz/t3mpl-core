@@ -13,6 +13,8 @@ describe('PagesDataGenerator', () => {
 
 		pages.push({ name: 'ENTRIES', virtualFilePath: 'entries0.html', filePath: 'entries0.html', templateFilePath: 'entires.html',
 			subPages: [ pages[0], pages[1] ], index: 0 });
+		pages.push({ name: 'ENTRIES', virtualFilePath: 'entries1.html', filePath: 'entries1.html', templateFilePath: 'entires.html',
+			subPages: [ pages[2] ], index: 1 });
 
 		const data = {
 			A: {
@@ -68,5 +70,11 @@ describe('PagesDataGenerator', () => {
 		expect(entries0.DATA).toBeFalsy();
 		expect(entries0.$SUB_PAGES).toContain(alfa0);
 		expect(entries0.$SUB_PAGES).toContain(alfa1);
+
+		const entries1 = entries[1];
+		expect(entries1.FILE_PATH).toEqual('entries1.html');
+		expect(entries1.SUB_PAGE_NUMBER).toEqual(2);
+		expect(entries1.DATA).toBeFalsy();
+		expect(entries1.$SUB_PAGES).toContain(alfa2);
 	});
 });

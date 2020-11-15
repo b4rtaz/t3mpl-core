@@ -40,7 +40,8 @@ describe('FileNameGenerator', () => {
 		const t3 = generateFileName({
 			name: 'short',
 			fileExt: '.jpeg',
-			uniqueIdGenerator: fakeUniqueIdGenerator
+			uniqueIdGenerator: fakeUniqueIdGenerator,
+			minUniqueIdLength: 10
 		});
 
 		expect(t3).toEqual('short-%%%%%%%%%%%%%.jpeg');
