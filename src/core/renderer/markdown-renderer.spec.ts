@@ -1,4 +1,6 @@
 import { MemoryStorage } from '../memory-storage';
+import { HtmlInjector } from './html-injector';
+import { InlineHtmlInjector } from './inline/inline-html-injector';
 import { extractExcerpt, MarkdownRenderer } from './markdown-renderer';
 
 describe('MarkdownRenderer', () => {
@@ -10,7 +12,7 @@ describe('MarkdownRenderer', () => {
 	});
 
 	it ('render() returns [NULL] when file path is null', () => {
-		const renderer = new MarkdownRenderer(false, contentStorage);
+		const renderer = new MarkdownRenderer(new FakeHtmlInjector(), contentStorage);
 
 		const html = renderer.render(false, null);
 
@@ -18,7 +20,7 @@ describe('MarkdownRenderer', () => {
 	});
 
 	it ('render() returns proper value', () => {
-		const renderer = new MarkdownRenderer(false, contentStorage);
+		const renderer = new MarkdownRenderer(new FakeHtmlInjector(), contentStorage);
 
 		contentStorage.setContent('text', 'content/foo.md', '**bold**');
 
@@ -28,7 +30,7 @@ describe('MarkdownRenderer', () => {
 	});
 
 	it ('render() when excerpt mode is enabled then returns cutted content', () => {
-		const renderer = new MarkdownRenderer(false, contentStorage);
+		const renderer = new MarkdownRenderer(new FakeHtmlInjector(), contentStorage);
 
 		contentStorage.setContent('text', 'a.md', 'Te<!--more-->st');
 		contentStorage.setContent('text', 'b.md', 'Test');
@@ -41,7 +43,7 @@ describe('MarkdownRenderer', () => {
 	});
 
 	it ('render() when inline mode is enabled then returns processed html to inline', () => {
-		const renderer = new MarkdownRenderer(true, contentStorage);
+		const renderer = new MarkdownRenderer(new InlineHtmlInjector(contentStorage), contentStorage);
 
 		contentStorage.setContent('dataUrl', 'image.jpg', 'IM4G3_C0NT3NT');
 		contentStorage.setContent('text', 'text.md', '![img](image.jpg)');
@@ -50,6 +52,12 @@ describe('MarkdownRenderer', () => {
 
 		expect(html).toContain('IM4G3_C0NT3NT');
 	});
+
+	class FakeHtmlInjector implements HtmlInjector {
+		public inject(html: string): string {
+			return html;
+		}
+	}
 });
 
 describe('extractExcerpt', () => {

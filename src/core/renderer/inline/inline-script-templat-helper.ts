@@ -1,3 +1,5 @@
+import { HTMLElement } from 'node-html-parser';
+
 import { ReadableStorage } from '../../storage';
 import { TemplateHelper } from '../template-helper';
 
@@ -11,9 +13,9 @@ export class InlineScriptTemplateHelper implements TemplateHelper {
 	public execute(filePath: string): string {
 		const rawJs = this.templateStorage.getContent('text', filePath);
 
-		const script = document.createElement('script');
+		const script = new HTMLElement('script', {});
 		script.setAttribute('type', 'text/javascript');
-		script.innerHTML = rawJs;
+		script.set_content(rawJs);
 		return script.outerHTML;
 	}
 }

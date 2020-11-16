@@ -1,4 +1,5 @@
 import { MemoryStorage } from '../../memory-storage';
+import { InlineHtmlInjector } from '../inline/inline-html-injector';
 import { MarkdownRenderer } from '../markdown-renderer';
 import { MarkdownTemplateHelper } from './markdown-template-helper';
 
@@ -10,7 +11,7 @@ describe('MarkdownTemplateHelper', () => {
 
 	beforeEach(() => {
 		contentStorage = new MemoryStorage();
-		renderer = new MarkdownRenderer(false, contentStorage);
+		renderer = new MarkdownRenderer(new InlineHtmlInjector(contentStorage), contentStorage);
 		helper = new MarkdownTemplateHelper(renderer);
 	});
 
@@ -23,10 +24,11 @@ describe('MarkdownTemplateHelper', () => {
 	});
 
 	it ('execute() does not support excerpt', () => {
-		contentStorage.setContent('text', 'foo.md', 'Te<!--more-->st');
+		contentStorage.setContent('text', 'foo.md', '12345<!--more-->6789');
 
 		const html = helper.execute('foo.md');
 
-		expect(html).toContain('Te<!--more-->st');
+		expect(html).toContain('12345');
+		expect(html).toContain('6789');
 	});
 });

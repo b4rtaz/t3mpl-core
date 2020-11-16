@@ -5,7 +5,7 @@
 		"module": "commonjs",
 		"sourceMap": false,
 		"allowJs": false,
-		"lib": [ "es2017", "dom" ],
+		"lib": [ "es2017" ],
 		"moduleResolution": "node",
 		"declaration": true,
 		"declarationDir": "./",

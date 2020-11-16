@@ -1,5 +1,5 @@
 
 export interface TemplateHelper {
 	name: string;
-	execute(...args: string[]): string;
+	execute(...args: any[]): string;
 }

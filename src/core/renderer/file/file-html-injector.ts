@@ -1,13 +1,13 @@
-import { parse } from 'node-html-parser';
+import parse from 'node-html-parser';
 
-import { ReadableStorage } from '../../storage';
+import { relativize } from '../../utils/path-utils';
 import { isRelativeUrl } from '../../utils/url-utils';
 import { HtmlInjector } from '../html-injector';
 
-export class InlineHtmlInjector implements HtmlInjector {
+export class FileHtmlInjector implements HtmlInjector {
 
 	public constructor(
-		private readonly contentStorage: ReadableStorage) {
+		private readonly currentPagePath: string) {
 	}
 
 	public inject(html: string): string {
@@ -19,8 +19,8 @@ export class InlineHtmlInjector implements HtmlInjector {
 			if (srcAttrName) {
 				const src = img.getAttribute(srcAttrName);
 				if (src && isRelativeUrl(src)) {
-					const content = this.contentStorage.getContent('dataUrl', src);
-					img.setAttribute(srcAttrName, content);
+					const relativeFilePath = relativize(this.currentPagePath, src);
+					img.setAttribute(srcAttrName, relativeFilePath);
 				}
 			}
 		}

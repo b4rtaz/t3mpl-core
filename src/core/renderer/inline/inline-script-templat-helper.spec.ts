@@ -1,3 +1,5 @@
+import { parse } from 'node-html-parser';
+
 import { MemoryStorage } from '../../memory-storage';
 import { InlineScriptTemplateHelper } from './inline-script-templat-helper';
 
@@ -13,8 +15,7 @@ describe('InlineScriptTemplateHelper', () => {
 
 		const html = helper.execute('file.js');
 
-		const parser = new DOMParser();
-		const doc = parser.parseFromString(html, 'text/html');
+		const doc = parse(html);
 
 		const script = doc.querySelector('script');
 		expect(script).not.toBeNull();

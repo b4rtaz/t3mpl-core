@@ -1,3 +1,5 @@
+import parse from 'node-html-parser';
+
 import { MemoryStorage } from '../../memory-storage';
 import { InlineCssTemplateHelper } from './inline-css-template-helper';
 
@@ -38,8 +40,7 @@ describe('InlineCssTemplateHelper', () => {
 
 		const html = helper.execute('style.css');
 
-		const parser = new DOMParser();
-		const doc = parser.parseFromString(html, 'text/html');
+		const doc = parse(html);
 		const style = doc.querySelector('style');
 		expect(style).not.toBeNull();
 		expect(style.getAttribute('type')).toEqual('text/css');

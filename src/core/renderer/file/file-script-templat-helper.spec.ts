@@ -1,3 +1,5 @@
+import parse from 'node-html-parser';
+
 import { MemoryStorage } from '../../memory-storage';
 import { FileScriptTemplateHelper } from './file-script-templat-helper';
 
@@ -16,7 +18,7 @@ describe('FileScriptTemplateHelper', () => {
 
 		const html = helper.execute('js.js');
 
-		const doc = new DOMParser().parseFromString(html, 'text/html');
+		const doc = parse(html);
 
 		const script = doc.querySelector('script');
 		expect(script).not.toBeNull();

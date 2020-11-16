@@ -1,3 +1,5 @@
+import parse from 'node-html-parser';
+
 import { MemoryStorage } from '../../memory-storage';
 import { InlineHtmlInjector } from './inline-html-injector';
 
@@ -15,7 +17,7 @@ describe('InlineHtmlInjector', () => {
 <img src="http://foo.com/img.jpg" class="second">
 <img />`);
 
-		const doc = new DOMParser().parseFromString(injectedHtml, 'text/html');
+		const doc = parse(injectedHtml);
 
 		expect(doc.querySelector('img.first').getAttribute('src')).toEqual('data:');
 		expect(doc.querySelector('img.second').getAttribute('src')).toEqual('http://foo.com/img.jpg');

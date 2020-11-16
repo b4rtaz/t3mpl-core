@@ -12,12 +12,16 @@ import { ifEqualHelper } from './common/if-equal-helper';
 import { jsonHelper } from './common/json-helper';
 import { MarkdownExcerptTemplateHelper } from './common/markdown-excerpt-template-helper';
 import { MarkdownTemplateHelper } from './common/markdown-template-helper';
+import { MarkdownToTextHelper } from './common/markdown-to-text-helper';
 import { poweredByHelper } from './common/powered-by-helper';
 import { FileCssTemplateHelper } from './file/file-css-template-helper';
+import { FileHtmlInjector } from './file/file-html-injector';
 import { FileImageTemplateHelper } from './file/file-image-template-helper';
 import { FilePageLinkTemplateHelper } from './file/file-page-link-template-helper';
 import { FileScriptTemplateHelper } from './file/file-script-templat-helper';
+import { HtmlInjector } from './html-injector';
 import { InlineCssTemplateHelper } from './inline/inline-css-template-helper';
+import { InlineHtmlInjector } from './inline/inline-html-injector';
 import { InlineImageTemplateHelper } from './inline/inline-image-template-helper';
 import { InlinePageLinkTemplateHelper } from './inline/inline-page-link-template-helper';
 import { InlineScriptTemplateHelper } from './inline/inline-script-templat-helper';
@@ -71,21 +75,26 @@ export function getHelpers(inline: boolean, currentPagePath: string,
 	templateStorage: ReadableStorage, contentStorage: ReadableStorage): HelperMap {
 
 	const helpers = [];
+	let htmlInjector: HtmlInjector;
+
 	if (inline) {
+		htmlInjector = new InlineHtmlInjector(contentStorage);
 		helpers.push(new InlineCssTemplateHelper(templateStorage));
 		helpers.push(new InlineScriptTemplateHelper(templateStorage));
 		helpers.push(new InlineImageTemplateHelper(contentStorage));
 		helpers.push(new InlinePageLinkTemplateHelper());
 	} else {
+		htmlInjector = new FileHtmlInjector(currentPagePath);
 		helpers.push(new FileCssTemplateHelper(currentPagePath, templateStorage));
 		helpers.push(new FileScriptTemplateHelper(currentPagePath, templateStorage));
 		helpers.push(new FileImageTemplateHelper(currentPagePath, contentStorage));
 		helpers.push(new FilePageLinkTemplateHelper(currentPagePath));
 	}
 
-	const markdownRenderer = new MarkdownRenderer(inline, contentStorage);
+	const markdownRenderer = new MarkdownRenderer(htmlInjector, contentStorage);
 	helpers.push(new MarkdownTemplateHelper(markdownRenderer));
 	helpers.push(new MarkdownExcerptTemplateHelper(markdownRenderer));
+	helpers.push(new MarkdownToTextHelper(contentStorage));
 
 	helpers.push(new HtmlTemplateHelper(contentStorage));
 	helpers.push(new DateTimeTemplateHelper(null)); // TODO: utfOffset should come from project settings.

@@ -1,12 +1,12 @@
 import * as marked from 'marked';
 
 import { ReadableStorage } from '../storage';
-import { InlineHtmlInjector } from './inline/inline-html-injector';
+import { HtmlInjector } from './html-injector';
 
 export class MarkdownRenderer {
 
 	public constructor(
-		private readonly inline: boolean,
+		private readonly htmlInjector: HtmlInjector,
 		private readonly contentStorage: ReadableStorage) {
 	}
 
@@ -19,10 +19,7 @@ export class MarkdownRenderer {
 			content = extractExcerpt(content);
 		}
 		let html = marked(content);
-		if (this.inline) {
-			const injector = new InlineHtmlInjector(this.contentStorage);
-			html = injector.inject(html);
-		}
+		html = this.htmlInjector.inject(html);
 		return html;
 	}
 }

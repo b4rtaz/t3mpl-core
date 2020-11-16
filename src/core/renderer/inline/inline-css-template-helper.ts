@@ -1,7 +1,9 @@
+import { HTMLElement } from 'node-html-parser';
+
 import { ReadableStorage } from '../../storage';
+import { getBasePath, simplifyPath } from '../../utils/path-utils';
 import { isRelativeUrl } from '../../utils/url-utils';
 import { TemplateHelper } from '../template-helper';
-import { getBasePath, simplifyPath } from '../../utils/path-utils';
 
 export class InlineCssTemplateHelper implements TemplateHelper {
 	public readonly name = '$css';
@@ -15,9 +17,9 @@ export class InlineCssTemplateHelper implements TemplateHelper {
 		const rawCss = this.templateStorage.getContent('text', filePath);
 		const css = this.process(basePath, rawCss);
 
-		const style = document.createElement('style');
+		const style = new HTMLElement('style', {});
 		style.setAttribute('type', 'text/css');
-		style.innerHTML = css;
+		style.set_content(css);
 		return style.outerHTML;
 	}
 

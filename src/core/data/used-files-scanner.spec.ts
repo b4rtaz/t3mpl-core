@@ -72,6 +72,7 @@ pages:
 	<span><IMG ALT="EXAMPLE" SRC="content/image/md-gamma.jpg" /></span>
 	<img src='content/image/md-delta.gif'>
 	<img src="http://some.com/image.jpg">
+	<img />
 </p>`);
 
 			const p = new UsedFilesScanner(contentStorage).scan(t.dataContract, data);

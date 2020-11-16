@@ -1,3 +1,5 @@
+import { parse } from 'node-html-parser';
+
 import { MemoryStorage } from '../../memory-storage';
 import { FileCssTemplateHelper } from './file-css-template-helper';
 
@@ -18,7 +20,7 @@ describe('FileCssTemplateHelper', () => {
 
 		const html = helper.execute(CSS_FILE_PATH);
 
-		const doc = new DOMParser().parseFromString(html, 'text/html');
+		const doc = parse(html);
 
 		const link = doc.querySelector('link');
 		expect(link).not.toBeNull();

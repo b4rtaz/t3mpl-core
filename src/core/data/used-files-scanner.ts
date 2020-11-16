@@ -1,4 +1,5 @@
 import * as marked from 'marked';
+import { parse } from 'node-html-parser';
 
 import { CollectionPropertyContract, DataContract, PropertyContract, PropertyContractType } from '../model';
 import { ReadableStorage } from '../storage';
@@ -96,16 +97,17 @@ export class UsedFilesScanner {
 	}
 
 	private scanHtml(html: string, usedFilePaths: string[]) {
-		const regexp = new RegExp(/<\s*img[^>]*src=["']([^"']+)["'][^>]*>/gi);
-		let result: RegExpExecArray;
-		do {
-			result = regexp.exec(html);
-			if (result) {
-				const url = result[1];
-				if (isRelativeUrl(url)) {
-					usedFilePaths.push(result[1]);
+		const doc = parse(html);
+
+		const imgs = doc.querySelectorAll('img');
+		for (const img of imgs) {
+			const srcAttrName = Object.keys(img.attributes).find(a => a.toLowerCase() === 'src');
+			if (srcAttrName) {
+				const src = img.getAttribute(srcAttrName);
+				if (src && isRelativeUrl(src)) {
+					usedFilePaths.push(src);
 				}
 			}
-		} while (result);
+		}
 	}
 }
