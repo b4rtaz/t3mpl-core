@@ -1,44 +1,45 @@
 import * as fs from 'fs';
+import * as path from 'path';
 
 import { DataActivator } from '../core/data/data-activator';
 import { DataSerializer } from '../core/data/data-serializer';
 import { PagesDataGenerator } from '../core/data/pages-data-generator';
-import { UsedFilesScanner } from '../core/data/used-files-scanner';
 import { Exporter } from '../core/exporter';
 import { MemoryStorage } from '../core/memory-storage';
 import { TemplateData } from '../core/model';
 import { PagesResolver } from '../core/pages-resolver';
 import { TemplateRenderer } from '../core/renderer/template-renderer';
+import { UsedFilesScanner } from '../core/scanners/used-files-scanner';
 import { ContentType } from '../core/storage';
 import { getDefaultConfiguration } from '../core/template-configuration';
 import { TemplateManifestParser } from '../core/template-manifest-parser';
-import { getBasePath, getFileExt, isTextFileExt, simplifyPath } from '../core/utils/path-utils';
+import { getBasePath, getFileExt, isTextFileExt } from '../core/utils/path-utils';
 import { getArg, tryGetArg } from './node-utils';
 
 function readFiles(basePath: string, filePaths: string[]): MemoryStorage {
 	const storage = new MemoryStorage();
 
 	for (const filePath of filePaths) {
-		const path = simplifyPath(basePath + filePath);
-		const fileExt = getFileExt(path);
+		const finalPath = path.join(basePath, filePath);
+		const fileExt = getFileExt(finalPath);
 		const isText = isTextFileExt(fileExt);
 
 		if (isText) {
-			const text = fs.readFileSync(path, 'utf8');
+			const text = fs.readFileSync(finalPath, 'utf8');
 			storage.setContent('text', filePath, text);
 		} else {
-			const content = fs.readFileSync(path, 'binary');
+			const content = fs.readFileSync(finalPath, 'binary');
 			storage.setContent('binary', filePath, content);
 		}
 	}
 	return storage;
 }
 
-function writeFile(path: string, buffer: Buffer) {
-	const dirPath = getBasePath(path);
+function writeFile(filePath: string, buffer: Buffer) {
+	const dirPath = path.dirname(filePath);
 	fs.mkdirSync(dirPath, { recursive: true });
-	fs.writeFileSync(path, buffer);
-	console.log(`${path} ${buffer.byteLength} bytes`);
+	fs.writeFileSync(filePath, buffer);
+	console.log(`${filePath} ${buffer.byteLength} bytes`);
 }
 
 export function build() {
@@ -52,7 +53,7 @@ export function build() {
 	const parser = new TemplateManifestParser();
 	const manifest = parser.parse(manifestRaw);
 
-	const templateStorage = readFiles(getBasePath(manifestPath), manifest.meta.filePaths);
+	const templateStorage = readFiles(path.dirname(manifestPath), manifest.meta.filePaths);
 	let contentStorage: MemoryStorage;
 	let templateData: TemplateData;
 
@@ -81,13 +82,13 @@ export function build() {
 	const renderer = new TemplateRenderer(false, templateStorage, contentStorage, pagesDataGenerator);
 	const usedFilesScanner = new UsedFilesScanner(contentStorage);
 
-	Exporter.exportRelease(manifest, templateData.data, contentStorage, templateStorage, pagesResolver, renderer, usedFilesScanner,
+	Exporter.exportRelease(manifest, templateData, contentStorage, templateStorage, pagesResolver, renderer, usedFilesScanner,
 		(filePath, contentType: ContentType, content) => {
-			const realPath = simplifyPath(outDir + filePath);
+			const finalPath = path.join(outDir, filePath);
 			if (contentType === 'text') {
-				writeFile(realPath, Buffer.from(content, 'utf8'));
+				writeFile(finalPath, Buffer.from(content, 'utf8'));
 			} else {
-				writeFile(realPath, Buffer.from(content, 'binary'));
+				writeFile(finalPath, Buffer.from(content, 'binary'));
 			}
 		});
 }

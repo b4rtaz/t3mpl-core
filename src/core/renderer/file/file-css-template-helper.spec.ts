@@ -2,6 +2,7 @@ import { parse } from 'node-html-parser';
 
 import { MemoryStorage } from '../../memory-storage';
 import { FileCssTemplateHelper } from './file-css-template-helper';
+import { FileUrlBuilder } from './file-url-builder';
 
 describe('FileCssTemplateHelper', () => {
 
@@ -12,7 +13,8 @@ describe('FileCssTemplateHelper', () => {
 
 	beforeEach(() => {
 		storage = new MemoryStorage();
-		helper = new FileCssTemplateHelper('index.html', storage);
+		const fub = new FileUrlBuilder('index.html');
+		helper = new FileCssTemplateHelper(fub, storage);
 	});
 
 	it('execute() returns proper value', () => {

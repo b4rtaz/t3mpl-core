@@ -163,6 +163,7 @@ export interface TemplateData {
 
 export interface TemplateConfiguration {
 	pagePathStrategy: PagePathStrategy;
+	baseUrl?: string;
 }
 
 export interface TemplateDataMeta {

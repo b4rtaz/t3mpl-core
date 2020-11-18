@@ -1,11 +1,19 @@
 import { DataSerializer } from './data/data-serializer';
 import { PagesDataGenerator } from './data/pages-data-generator';
-import { UsedFilesScanner } from './data/used-files-scanner';
 import { Exporter } from './exporter';
 import { MemoryStorage } from './memory-storage';
-import { CollectionPropertyContract, PagePathStrategy, PropertyContractType, TemplateConfiguration, TemplateManifest } from './model';
+import {
+	CollectionPropertyContract,
+	PagePathStrategy,
+	PropertyContractType,
+	TemplateConfiguration,
+	TemplateData,
+	TemplateDataMeta,
+	TemplateManifest
+} from './model';
 import { PagesResolver } from './pages-resolver';
 import { TemplateRenderer } from './renderer/template-renderer';
+import { UsedFilesScanner } from './scanners/used-files-scanner';
 import { ContentType } from './storage';
 
 describe('Exporter', () => {
@@ -78,11 +86,16 @@ describe('Exporter', () => {
 				}
 			}
 		};
+		const templateData: TemplateData = {
+			meta: {} as TemplateDataMeta,
+			data: data,
+			configuration: configuration
+		};
 		const dataSerializer = new DataSerializer();
 		const usedFilesScanner = new UsedFilesScanner(storage);
 
 		const files: { [filePath: string]: ContentType } = {};
-		Exporter.exportData(manifest, configuration, data, storage, dataSerializer, usedFilesScanner, (filePath, contentType, content) => {
+		Exporter.exportData(manifest, templateData, storage, dataSerializer, usedFilesScanner, (filePath, contentType, content) => {
 			expect(content).toBeDefined();
 			files[filePath] = contentType;
 		});
@@ -165,9 +178,16 @@ describe('Exporter', () => {
 				}
 			}
 		};
+		const templateData: TemplateData = {
+			meta: {} as TemplateDataMeta,
+			data: data,
+			configuration: {
+				pagePathStrategy: PagePathStrategy.absolute
+			}
+		};
 
 		const files: { [filePath: string]: ContentType } = {};
-		Exporter.exportRelease(manifest, data, contentStorage, templateStorage, pagesResolver, templateRenderer, usedFilesScanner,
+		Exporter.exportRelease(manifest, templateData, contentStorage, templateStorage, pagesResolver, templateRenderer, usedFilesScanner,
 			(filePath, contentType, content) => {
 				expect(content).toBeDefined();
 				files[filePath] = contentType;

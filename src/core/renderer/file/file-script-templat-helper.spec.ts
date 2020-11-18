@@ -2,6 +2,7 @@ import parse from 'node-html-parser';
 
 import { MemoryStorage } from '../../memory-storage';
 import { FileScriptTemplateHelper } from './file-script-templat-helper';
+import { FileUrlBuilder } from './file-url-builder';
 
 describe('FileScriptTemplateHelper', () => {
 
@@ -10,7 +11,8 @@ describe('FileScriptTemplateHelper', () => {
 
 	beforeEach(() => {
 		storage = new MemoryStorage();
-		helper = new FileScriptTemplateHelper('index.html', storage);
+		const fub = new FileUrlBuilder('index.html');
+		helper = new FileScriptTemplateHelper(fub, storage);
 	});
 
 	it('execute() returns proper value', () => {

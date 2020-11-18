@@ -21,4 +21,7 @@ function upgradeData(td: TemplateData) {
 	if (!td.configuration) {
 		td.configuration = getDefaultConfiguration();
 	}
+	if (td.configuration.baseUrl === undefined) {
+		td.configuration.baseUrl = null;
+	}
 }

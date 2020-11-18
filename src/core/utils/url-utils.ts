@@ -9,3 +9,12 @@ export function isRelativeUrl(url: string): boolean {
 export function isDataUrl(data: string): boolean {
 	return data.startsWith('data:');
 }
+
+export function concatUrl(baseUrl: string, path: string): string {
+	let url = baseUrl;
+	if (!url.endsWith('/')) {
+		url += '/';
+	}
+	url += path;
+	return url.replace(/\/\.\//g, '/');
+}

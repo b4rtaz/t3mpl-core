@@ -1,6 +1,7 @@
 import * as marked from 'marked';
 
 import { ReadableStorage } from '../../storage';
+import { MarkdownScanner } from '../../scanners/markdown-scanner';
 import { TemplateHelper } from '../template-helper';
 
 const ELLIPSES = '...';
@@ -15,31 +16,20 @@ export class MarkdownToTextHelper implements TemplateHelper {
 	public execute(filePath: string, limit?: number): string {
 		const content = this.contentStorage.getContent('text', filePath);
 
-		const tokens = marked.lexer(content);
-		let text = this.trim(this.readText(tokens));
-
+		let text = this.extractText(content);
 		if (limit && typeof(limit) === 'number' && text.length > limit - ELLIPSES.length) {
 			text = text.substring(0, limit - ELLIPSES.length).trimRight() + ELLIPSES;
 		}
 		return text;
 	}
 
-	private trim(text: string): string {
-		return text.replace(/\s+/g, ' ').trim();
-	}
-
-	private readText(tokens: marked.TokensList): string {
+	private extractText(content: string) {
 		let text = '';
-		for (const token of tokens) {
-			const tt = token as marked.Tokens.Text;
-			if (tt.type === 'text') {
-				text += tt.text + ' ';
+		MarkdownScanner.scan(content, (type, token) => {
+			if (type === 'text') {
+				text += (token as marked.Tokens.Text).text + ' ';
 			}
-			const children = (token as any).tokens;
-			if (children) {
-				text += this.readText(children) + ' ';
-			}
-		}
-		return text;
+		});
+		return text.replace(/\s+/g, ' ').trim();
 	}
 }

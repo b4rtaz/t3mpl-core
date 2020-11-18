@@ -1,10 +1,9 @@
-import * as marked from 'marked';
-import { parse } from 'node-html-parser';
-
+import { DataPath } from '../data/data-path';
 import { CollectionPropertyContract, DataContract, PropertyContract, PropertyContractType } from '../model';
 import { ReadableStorage } from '../storage';
 import { isRelativeUrl } from '../utils/url-utils';
-import { DataPath } from './data-path';
+import { HtmlImagesScanner } from './html-images-scanner';
+import { MarkdownImagesScanner } from './markdown-images-scanner';
 
 export class UsedFilesScanner {
 
@@ -43,7 +42,7 @@ export class UsedFilesScanner {
 				if (htmlFilePath) {
 					usedFilePaths.push(htmlFilePath);
 					const html = this.contentStorage.getContent('text', htmlFilePath);
-					this.scanHtml(html, usedFilePaths);
+					this.scanHtmlImages(html, usedFilePaths);
 				}
 				break;
 
@@ -52,9 +51,8 @@ export class UsedFilesScanner {
 				if (mdFilePath) {
 					usedFilePaths.push(mdFilePath);
 
-					const markdown = this.contentStorage.getContent('text', mdFilePath);
-					const tokens = marked.lexer(markdown);
-					this.scanMarkdown(tokens, usedFilePaths);
+					const mdContent = this.contentStorage.getContent('text', mdFilePath);
+					this.scanMarkdown(mdContent, usedFilePaths);
 				}
 				break;
 
@@ -74,40 +72,15 @@ export class UsedFilesScanner {
 		}
 	}
 
-	private scanMarkdown(tokens: marked.TokensList, usedFilePaths: string[]) {
-		for (const token of tokens) {
-			const image = token as marked.Tokens.Image;
-			if (image.type === 'image') {
-				usedFilePaths.push(image.href);
-				continue;
-			}
-
-			const html = token as marked.Tokens.HTML;
-			if (html.type === 'html') {
-				this.scanHtml(html.raw, usedFilePaths);
-				continue;
-			}
-
-			const children = (token as any).tokens;
-			if (children) {
-				this.scanMarkdown(children, usedFilePaths);
-				continue;
-			}
-		}
+	private scanMarkdown(content: string, usedFilePaths: string[]) {
+		const filePaths = MarkdownImagesScanner.scanUrls(content)
+			.filter(url => isRelativeUrl(url));
+		usedFilePaths.push(...filePaths);
 	}
 
-	private scanHtml(html: string, usedFilePaths: string[]) {
-		const doc = parse(html);
-
-		const imgs = doc.querySelectorAll('img');
-		for (const img of imgs) {
-			const srcAttrName = Object.keys(img.attributes).find(a => a.toLowerCase() === 'src');
-			if (srcAttrName) {
-				const src = img.getAttribute(srcAttrName);
-				if (src && isRelativeUrl(src)) {
-					usedFilePaths.push(src);
-				}
-			}
-		}
+	private scanHtmlImages(html: string, usedFilePaths: string[]) {
+		const filePaths = HtmlImagesScanner.scanUrls(html)
+			.filter(url => isRelativeUrl(url));
+		usedFilePaths.push(...filePaths);
 	}
 }

@@ -1,14 +1,14 @@
 import * as Handlebars from 'handlebars';
 
 import { ReadableStorage } from '../../storage';
-import { relativize } from '../../utils/path-utils';
 import { TemplateHelper } from '../template-helper';
+import { FileUrlBuilder } from './file-url-builder';
 
 export class FileScriptTemplateHelper implements TemplateHelper {
 	public readonly name = '$script';
 
 	public constructor(
-		private readonly currentPagePath: string,
+		private readonly fileUrlBuilder: FileUrlBuilder,
 		private readonly templateStorage: ReadableStorage) {
 	}
 
@@ -17,7 +17,7 @@ export class FileScriptTemplateHelper implements TemplateHelper {
 			throw new Error(`Cannot find script file ${filePath}.`);
 		}
 
-		const relativeFilePath = relativize(this.currentPagePath, filePath);
-		return `<script type="text/javascript" src="${Handlebars.Utils.escapeExpression(relativeFilePath)}" /></script>`;
+		const url = this.fileUrlBuilder.build(filePath);
+		return `<script type="text/javascript" src="${Handlebars.Utils.escapeExpression(url)}" /></script>`;
 	}
 }

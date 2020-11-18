@@ -1,14 +1,14 @@
 import * as Handlebars from 'handlebars';
 
 import { ReadableStorage } from '../../storage';
-import { relativize } from '../../utils/path-utils';
 import { TemplateHelper } from '../template-helper';
+import { FileUrlBuilder } from './file-url-builder';
 
 export class FileCssTemplateHelper implements TemplateHelper {
 	public readonly name = '$css';
 
 	public constructor(
-		private readonly currentPagePath: string,
+		private readonly fileUrlBuilder: FileUrlBuilder,
 		private readonly templateStorage: ReadableStorage) {
 	}
 
@@ -17,7 +17,7 @@ export class FileCssTemplateHelper implements TemplateHelper {
 			throw new Error(`Cannot find CSS file ${filePath}.`);
 		}
 
-		const relativeFilePath = relativize(this.currentPagePath, filePath);
-		return `<link rel="stylesheet" href="${Handlebars.Utils.escapeExpression(relativeFilePath)}" />`;
+		const url = this.fileUrlBuilder.build(filePath);
+		return `<link rel="stylesheet" href="${Handlebars.Utils.escapeExpression(url)}" />`;
 	}
 }

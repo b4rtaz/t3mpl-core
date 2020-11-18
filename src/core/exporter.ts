@@ -6,7 +6,7 @@ import {
 	TEMPLATE_MANIFEST_FILE_NAME
 } from './constants';
 import { DataSerializer } from './data/data-serializer';
-import { UsedFilesScanner } from './data/used-files-scanner';
+import { UsedFilesScanner } from './scanners/used-files-scanner';
 import { TemplateData, TemplateConfiguration, TemplateManifest } from './model';
 import { PagesResolver } from './pages-resolver';
 import { TemplateRenderer } from './renderer/template-renderer';
@@ -17,7 +17,7 @@ export class Exporter {
 
 	public static exportRelease(
 		templateManifest: TemplateManifest,
-		data: any,
+		templateData: TemplateData,
 		contentStorage: ReadableStorage,
 		templateStorage: ReadableStorage,
 		pagesResolver: PagesResolver,
@@ -25,16 +25,16 @@ export class Exporter {
 		usedFilesScanner: UsedFilesScanner,
 		handler: ExportHandler
 	) {
-		const pages = pagesResolver.resolve(templateManifest.pages, data);
+		const pages = pagesResolver.resolve(templateManifest.pages, templateData.data);
 		const exportedFilePaths = [];
 
 		for (const page of pages) {
-			const content = tempateRenderer.render(pages, page, data);
+			const content = tempateRenderer.render(pages, page, templateData);
 			handler(page.filePath, 'text', content);
 			exportedFilePaths.push(page.filePath);
 		}
 
-		const usedFilesPaths = usedFilesScanner.scan(templateManifest.dataContract, data);
+		const usedFilesPaths = usedFilesScanner.scan(templateManifest.dataContract, templateData.data);
 
 		exportStorage(contentStorage, exportedFilePaths, handler, filePath => {
 			return !filePath.startsWith(HTML_CONTENT_BASE_PATH) &&
@@ -59,30 +59,21 @@ export class Exporter {
 
 	public static exportData(
 		templateManifest: TemplateManifest,
-		configuration: TemplateConfiguration,
-		data: any,
+		templateData: TemplateData,
 		contentStorage: ReadableStorage,
 		dataSerializer: DataSerializer,
 		usedFilesScanner: UsedFilesScanner,
 		handler: ExportHandler
 	) {
-		const usedFilesPaths = usedFilesScanner.scan(templateManifest.dataContract, data);
+		const usedFilesPaths = usedFilesScanner.scan(templateManifest.dataContract, templateData.data);
 
 		const exportedFilePaths = [TEMPLATE_DATA_FILE_NAME];
 		exportStorage(contentStorage, exportedFilePaths, handler,
 			(filePath) => usedFilesPaths.includes(filePath));
 
-		const td: TemplateData = {
-			meta: {
-				name: templateManifest.meta.name,
-				version: templateManifest.meta.version,
-				filePaths: exportedFilePaths
-			},
-			configuration,
-			data: data
-		};
+		templateData.meta.filePaths = exportedFilePaths;
 
-		const tdData = dataSerializer.serialize(td);
+		const tdData = dataSerializer.serialize(templateData);
 		handler(TEMPLATE_DATA_FILE_NAME, 'text', tdData);
 	}
 }

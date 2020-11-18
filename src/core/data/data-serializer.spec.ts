@@ -53,5 +53,27 @@ describe('DataSerializer', () => {
 
 		expect(d.configuration).toBeDefined();
 		expect(d.configuration.pagePathStrategy).toEqual(PagePathStrategy.absolute);
+		expect(d.configuration.baseUrl).toBeNull();
+	});
+
+	it('deserialize() upgrades data with no baseUrl', () => {
+		const json = `{
+			"meta": {
+				"name": "Boilerplate",
+				"version": 1,
+				"filePaths": [ "data.json" ]
+			},
+			"data": {
+				"A": { "B": { "C": 1 } }
+			},
+			"configuration": {
+				"pagePathStrategy": "directory"
+			}
+		}`;
+
+		const d = ser.deserialize(json);
+
+		expect(d.configuration.pagePathStrategy).toEqual(PagePathStrategy.directory);
+		expect(d.configuration.baseUrl).toBeNull();
 	});
 });

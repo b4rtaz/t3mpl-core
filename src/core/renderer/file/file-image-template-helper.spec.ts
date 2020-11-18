@@ -1,5 +1,6 @@
 import { MemoryStorage } from '../../memory-storage';
 import { FileImageTemplateHelper } from './file-image-template-helper';
+import { FileUrlBuilder } from './file-url-builder';
 
 describe('FileImageTemplateHelper', () => {
 
@@ -8,7 +9,8 @@ describe('FileImageTemplateHelper', () => {
 
 	beforeEach(() => {
 		storage = new MemoryStorage();
-		helper = new FileImageTemplateHelper('index.html', storage);
+		const fub = new FileUrlBuilder('index.html');
+		helper = new FileImageTemplateHelper(fub, storage);
 	});
 
 	it('execute() returns proper value', () => {

@@ -1,11 +1,13 @@
 import parse from 'node-html-parser';
 
 import { FileHtmlInjector } from './file-html-injector';
+import { FileUrlBuilder } from './file-url-builder';
 
 describe('FileHtmlInjector', () => {
 
 	it('inject() injects properly', () => {
-		const injector = new FileHtmlInjector('articles/');
+		const fub = new FileUrlBuilder('articles/');
+		const injector = new FileHtmlInjector(fub);
 
 		const injectedHtml = injector.inject(
 `<img src="foo.jpg" class="first" />

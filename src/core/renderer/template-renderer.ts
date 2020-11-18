@@ -2,7 +2,7 @@ import * as Handlebars from 'handlebars';
 
 import { PARTIAL_EXT } from '../constants';
 import { PagesDataGenerator } from '../data/pages-data-generator';
-import { Page } from '../model';
+import { Page, TemplateConfiguration, TemplateData } from '../model';
 import { ReadableStorage } from '../storage';
 import { getFileExt, getFilePathWithoutExt } from '../utils/path-utils';
 import { CopyrightTemplateHelper } from './common/copyright-template-helper';
@@ -17,8 +17,10 @@ import { poweredByHelper } from './common/powered-by-helper';
 import { FileCssTemplateHelper } from './file/file-css-template-helper';
 import { FileHtmlInjector } from './file/file-html-injector';
 import { FileImageTemplateHelper } from './file/file-image-template-helper';
+import { FileMarkdownThumbnailHelper } from './file/file-markdown-thumbnail-helper';
 import { FilePageLinkTemplateHelper } from './file/file-page-link-template-helper';
 import { FileScriptTemplateHelper } from './file/file-script-templat-helper';
+import { FileUrlBuilder } from './file/file-url-builder';
 import { HtmlInjector } from './html-injector';
 import { InlineCssTemplateHelper } from './inline/inline-css-template-helper';
 import { InlineHtmlInjector } from './inline/inline-html-injector';
@@ -36,19 +38,19 @@ export class TemplateRenderer {
 		private readonly pagesDataGenerator: PagesDataGenerator) {
 	}
 
-	public render(pages: Page[], currentPage: Page, data: any): string {
+	public render(pages: Page[], currentPage: Page, templateData: TemplateData): string {
 		const pageContent = this.templateStorage.getContent('text', currentPage.templateFilePath);
 
-		const pagesData = this.pagesDataGenerator.generateData(pages, currentPage, data);
+		const pagesData = this.pagesDataGenerator.generateData(pages, currentPage, templateData.data);
 
-		const extendedData = Object.assign(pagesData, data);
+		const extendedData = Object.assign(pagesData, templateData.data);
 
 		const template = Handlebars.compile(pageContent, {
 			strict: true
 		});
 		const output = template(extendedData, {
 			partials: getPartials(currentPage.templateFilePath, this.templateStorage),
-			helpers: getHelpers(this.inline, currentPage.filePath, this.templateStorage, this.contentStorage)
+			helpers: getHelpers(this.inline, currentPage.filePath, templateData.configuration, this.templateStorage, this.contentStorage)
 		});
 		return output;
 	}
@@ -71,10 +73,11 @@ export function getPartials(templateFilePath: string, templateStorage: ReadableS
 	return partials;
 }
 
-export function getHelpers(inline: boolean, currentPagePath: string,
+export function getHelpers(inline: boolean, currentPagePath: string, configuration: TemplateConfiguration,
 	templateStorage: ReadableStorage, contentStorage: ReadableStorage): HelperMap {
 
 	const helpers = [];
+	const fub = new FileUrlBuilder(currentPagePath, configuration.baseUrl);
 	let htmlInjector: HtmlInjector;
 
 	if (inline) {
@@ -84,17 +87,20 @@ export function getHelpers(inline: boolean, currentPagePath: string,
 		helpers.push(new InlineImageTemplateHelper(contentStorage));
 		helpers.push(new InlinePageLinkTemplateHelper());
 	} else {
-		htmlInjector = new FileHtmlInjector(currentPagePath);
-		helpers.push(new FileCssTemplateHelper(currentPagePath, templateStorage));
-		helpers.push(new FileScriptTemplateHelper(currentPagePath, templateStorage));
-		helpers.push(new FileImageTemplateHelper(currentPagePath, contentStorage));
-		helpers.push(new FilePageLinkTemplateHelper(currentPagePath));
+		htmlInjector = new FileHtmlInjector(fub);
+		helpers.push(new FileCssTemplateHelper(fub, templateStorage));
+		helpers.push(new FileScriptTemplateHelper(fub, templateStorage));
+		helpers.push(new FileImageTemplateHelper(fub, contentStorage));
+		helpers.push(new FilePageLinkTemplateHelper(fub));
 	}
 
 	const markdownRenderer = new MarkdownRenderer(htmlInjector, contentStorage);
 	helpers.push(new MarkdownTemplateHelper(markdownRenderer));
 	helpers.push(new MarkdownExcerptTemplateHelper(markdownRenderer));
 	helpers.push(new MarkdownToTextHelper(contentStorage));
+
+	// TODO: needs inline version.
+	helpers.push(new FileMarkdownThumbnailHelper(fub, contentStorage));
 
 	helpers.push(new HtmlTemplateHelper(contentStorage));
 	helpers.push(new DateTimeTemplateHelper(null)); // TODO: utfOffset should come from project settings.

@@ -1,20 +1,20 @@
 import * as Handlebars from 'handlebars';
 
-import { relativize } from '../../utils/path-utils';
 import { TemplateHelper } from '../template-helper';
+import { FileUrlBuilder } from './file-url-builder';
 
 export class FilePageLinkTemplateHelper implements TemplateHelper {
 	public name = '$page_link';
 
 	public constructor(
-		private readonly currentPagePath: string) {
+		private readonly fileUrlBuilder: FileUrlBuilder) {
 	}
 
 	public execute(pageVirtualFilePath: string, title: string, className?: string): string {
-		const relativeFilePath = relativize(this.currentPagePath, pageVirtualFilePath);
+		const url = this.fileUrlBuilder.build(pageVirtualFilePath);
 
 		let html = '<a href="';
-		html += Handlebars.Utils.escapeExpression(relativeFilePath);
+		html += Handlebars.Utils.escapeExpression(url);
 		html += '"';
 		if (className && typeof(className) === 'string') {
 			html += ' class="';

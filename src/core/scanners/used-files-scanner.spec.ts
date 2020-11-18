@@ -67,11 +67,13 @@ pages:
 
 ![md-alfa](content/image/md-alfa.jpg)
 
+![w1](http://some.com/wrong1.jpg)
+
 <p>
 	<img src="content/image/md-beta.jpg" width="100" height="200" />
 	<span><IMG ALT="EXAMPLE" SRC="content/image/md-gamma.jpg" /></span>
 	<img src='content/image/md-delta.gif'>
-	<img src="http://some.com/image.jpg">
+	<img src="http://some.com/wrong2.jpg">
 	<img />
 </p>`);
 
@@ -86,6 +88,7 @@ pages:
 			expect(p).toContain('content/image/md-beta.jpg');
 			expect(p).toContain('content/image/md-gamma.jpg');
 			expect(p).toContain('content/image/md-delta.gif');
-			expect(p).not.toContain('http://some.com/image.jpg');
+			expect(p).not.toContain('http://some.com/wrong1.jpg');
+			expect(p).not.toContain('http://some.com/wrong2.jpg');
 		});
 });
