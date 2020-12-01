@@ -13,11 +13,14 @@ import { jsonHelper } from './common/json-helper';
 import { MarkdownExcerptTemplateHelper } from './common/markdown-excerpt-template-helper';
 import { MarkdownTemplateHelper } from './common/markdown-template-helper';
 import { MarkdownToTextHelper } from './common/markdown-to-text-helper';
+import { PageLinkEndTemplateHelper } from './common/page-link-end-template-helper';
 import { poweredByHelper } from './common/powered-by-helper';
 import { FileCssTemplateHelper } from './file/file-css-template-helper';
 import { FileHtmlInjector } from './file/file-html-injector';
 import { FileImageTemplateHelper } from './file/file-image-template-helper';
 import { FileMarkdownThumbnailHelper } from './file/file-markdown-thumbnail-helper';
+import { FilePageLinkUrlTemplateHelper } from './file/file-page-link-url-template-helper';
+import { FilePageLinkStartTemplateHelper } from './file/file-page-link-start-template-helper';
 import { FilePageLinkTemplateHelper } from './file/file-page-link-template-helper';
 import { FileScriptTemplateHelper } from './file/file-script-templat-helper';
 import { FileUrlBuilder } from './file/file-url-builder';
@@ -25,6 +28,7 @@ import { HtmlInjector } from './html-injector';
 import { InlineCssTemplateHelper } from './inline/inline-css-template-helper';
 import { InlineHtmlInjector } from './inline/inline-html-injector';
 import { InlineImageTemplateHelper } from './inline/inline-image-template-helper';
+import { InlinePageLinkStartTemplateHelper } from './inline/inline-page-link-start-template-helper';
 import { InlinePageLinkTemplateHelper } from './inline/inline-page-link-template-helper';
 import { InlineScriptTemplateHelper } from './inline/inline-script-templat-helper';
 import { MarkdownRenderer } from './markdown-renderer';
@@ -43,7 +47,11 @@ export class TemplateRenderer {
 
 		const pagesData = this.pagesDataGenerator.generateData(pages, currentPage, templateData.data);
 
-		const extendedData = Object.assign(pagesData, templateData.data);
+		const rendererData: RendererData = {
+			$INLINE: this.inline
+		};
+
+		const extendedData = Object.assign(pagesData, rendererData, templateData.data);
 
 		const template = Handlebars.compile(pageContent, {
 			strict: true
@@ -86,12 +94,14 @@ export function getHelpers(inline: boolean, currentPagePath: string, configurati
 		helpers.push(new InlineScriptTemplateHelper(templateStorage));
 		helpers.push(new InlineImageTemplateHelper(contentStorage));
 		helpers.push(new InlinePageLinkTemplateHelper());
+		helpers.push(new InlinePageLinkStartTemplateHelper());
 	} else {
 		htmlInjector = new FileHtmlInjector(fub);
 		helpers.push(new FileCssTemplateHelper(fub, templateStorage));
 		helpers.push(new FileScriptTemplateHelper(fub, templateStorage));
 		helpers.push(new FileImageTemplateHelper(fub, contentStorage));
 		helpers.push(new FilePageLinkTemplateHelper(fub));
+		helpers.push(new FilePageLinkStartTemplateHelper(fub));
 	}
 
 	const markdownRenderer = new MarkdownRenderer(htmlInjector, contentStorage);
@@ -101,7 +111,9 @@ export function getHelpers(inline: boolean, currentPagePath: string, configurati
 
 	// TODO: needs inline version.
 	helpers.push(new FileMarkdownThumbnailHelper(fub, contentStorage));
+	helpers.push(new FilePageLinkUrlTemplateHelper(fub));
 
+	helpers.push(new PageLinkEndTemplateHelper());
 	helpers.push(new HtmlTemplateHelper(contentStorage));
 	helpers.push(new DateTimeTemplateHelper(null)); // TODO: utfOffset should come from project settings.
 	helpers.push(new CopyrightTemplateHelper(null)); // TODO: ^
@@ -115,6 +127,10 @@ export function getHelpers(inline: boolean, currentPagePath: string, configurati
 	map.$powered_by = poweredByHelper;
 	map.$json = jsonHelper;
 	return map;
+}
+
+interface RendererData {
+	$INLINE: boolean;
 }
 
 export interface PartialMap {

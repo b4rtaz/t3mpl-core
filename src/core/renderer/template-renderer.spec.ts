@@ -35,11 +35,11 @@ describe('TemplateRenderer', () => {
 
 	it('render() returns proper value', () => {
 		const templateStorage = new MemoryStorage();
-		templateStorage.setContent('text', 'page.html', '{{> header}}_a_{{A.B.C}}_z_{{{$copyright}}}');
+		templateStorage.setContent('text', 'page.html', '{{> header}}_a_{{A.B.C}}{{#if $INLINE}}!!{{/if}}_z_{{{$copyright}}}');
 		templateStorage.setContent('text', 'header.partial', '1234');
 		const contentStorage = new MemoryStorage();
 		const pagesDataGenerator = new PagesDataGenerator();
-		const renderer = new TemplateRenderer(false, templateStorage, contentStorage, pagesDataGenerator);
+		const renderer = new TemplateRenderer(true, templateStorage, contentStorage, pagesDataGenerator);
 
 		const data = {
 			A: {
@@ -62,7 +62,7 @@ describe('TemplateRenderer', () => {
 
 		const html = renderer.render(pages, pages[0], templateData);
 
-		expect(html.startsWith('1234_a_Q_z_')).toBeTrue();
+		expect(html.startsWith('1234_a_Q!!_z_')).toBeTrue();
 		expect((<any>data).$PAGES).toBeUndefined();
 		expect((<any>data).$PAGE).toBeUndefined();
 	});

@@ -1,6 +1,7 @@
 import * as Handlebars from 'handlebars';
 
 import { TemplateHelper } from '../template-helper';
+import { FilePageLinkBuilder } from './file-page-link-builder';
 import { FileUrlBuilder } from './file-url-builder';
 
 export class FilePageLinkTemplateHelper implements TemplateHelper {
@@ -12,18 +13,10 @@ export class FilePageLinkTemplateHelper implements TemplateHelper {
 
 	public execute(pageVirtualFilePath: string, title: string, className?: string): string {
 		const url = this.fileUrlBuilder.build(pageVirtualFilePath);
+		const hasClassName = className && typeof(className) === 'string';
 
-		let html = '<a href="';
-		html += Handlebars.Utils.escapeExpression(url);
-		html += '"';
-		if (className && typeof(className) === 'string') {
-			html += ' class="';
-			html += Handlebars.Utils.escapeExpression(className);
-			html += '"';
-		}
-		html += '>';
-		html += Handlebars.Utils.escapeExpression(title);
-		html += '</a>';
-		return html;
+		return FilePageLinkBuilder.buildStartTag(url, hasClassName ? className : null) +
+			Handlebars.Utils.escapeExpression(title) +
+			FilePageLinkBuilder.buildEndTag();
 	}
 }

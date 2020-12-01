@@ -1,19 +1,16 @@
 import * as Handlebars from 'handlebars';
-import { HTMLElement } from 'node-html-parser';
 
 import { TemplateHelper } from '../template-helper';
+import { InlinePageLinkBuilder } from './inline-page-link-builder';
 
 export class InlinePageLinkTemplateHelper implements TemplateHelper {
 	public name = '$page_link';
 
 	public execute(pageVirtualFilePath: string, title: string, className?: string): string {
-		const a = new HTMLElement('a', {});
-		a.setAttribute('href', '#/' + pageVirtualFilePath);
-		a.setAttribute('onclick', 'window.parent.postMessage(\'openPage:' + pageVirtualFilePath + '\', \'*\'); event.preventDefault();');
-		if (className && typeof(className) === 'string') {
-			a.setAttribute('class', className);
-		}
-		a.set_content(Handlebars.Utils.escapeExpression(title));
-		return a.outerHTML;
+		const hasClassName = className && typeof(className) === 'string';
+
+		return InlinePageLinkBuilder.buildStartTag(pageVirtualFilePath, hasClassName ? className : null) +
+			Handlebars.Utils.escapeExpression(title) +
+			InlinePageLinkBuilder.buildEndTag();
 	}
 }
