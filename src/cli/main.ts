@@ -1,20 +1,20 @@
 import * as process from 'process';
 
-import { build } from './build';
-import { version } from './version';
+import { handleBuildCommand } from './commands/build-command';
+import { handleVersionCommand } from './commands/version-command';
 
 export function main() {
 	switch (process.argv[2]) {
 		case 'build':
-			build();
+			handleBuildCommand();
 			break;
 
 		case 'version':
-			version();
+			handleVersionCommand();
 			break;
 
 		default:
-			console.error('This command is not supported.');
+			console.error('This command is not supported');
 			break;
 	}
 }

@@ -7,7 +7,7 @@ import {
 } from './constants';
 import { DataSerializer } from './data/data-serializer';
 import { UsedFilesScanner } from './scanners/used-files-scanner';
-import { TemplateData, TemplateConfiguration, TemplateManifest } from './model';
+import { TemplateData, TemplateManifest } from './model';
 import { PagesResolver } from './pages-resolver';
 import { TemplateRenderer } from './renderer/template-renderer';
 import { ContentType, ReadableStorage } from './storage';

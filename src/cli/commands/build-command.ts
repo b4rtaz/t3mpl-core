@@ -1,20 +1,20 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { DataActivator } from '../core/data/data-activator';
-import { DataSerializer } from '../core/data/data-serializer';
-import { PagesDataGenerator } from '../core/data/pages-data-generator';
-import { Exporter } from '../core/exporter';
-import { MemoryStorage } from '../core/memory-storage';
-import { TemplateData } from '../core/model';
-import { PagesResolver } from '../core/pages-resolver';
-import { TemplateRenderer } from '../core/renderer/template-renderer';
-import { UsedFilesScanner } from '../core/scanners/used-files-scanner';
-import { ContentType } from '../core/storage';
-import { getDefaultConfiguration } from '../core/template-configuration';
-import { TemplateManifestParser } from '../core/template-manifest-parser';
-import { getBasePath, getFileExt, isTextFileExt } from '../core/utils/path-utils';
-import { getArg, tryGetArg } from './node-utils';
+import { DataActivator } from '../../core/data/data-activator';
+import { DataSerializer } from '../../core/data/data-serializer';
+import { PagesDataGenerator } from '../../core/data/pages-data-generator';
+import { Exporter } from '../../core/exporter';
+import { MemoryStorage } from '../../core/memory-storage';
+import { TemplateData } from '../../core/model';
+import { PagesResolver } from '../../core/pages-resolver';
+import { TemplateRenderer } from '../../core/renderer/template-renderer';
+import { UsedFilesScanner } from '../../core/scanners/used-files-scanner';
+import { ContentType } from '../../core/storage';
+import { getDefaultConfiguration } from '../../core/template-configuration';
+import { TemplateManifestParser } from '../../core/template-manifest-parser';
+import { getBasePath, getFileExt, isTextFileExt } from '../../core/utils/path-utils';
+import { getArg, tryGetArg } from '../node-utils';
 
 function readFiles(basePath: string, filePaths: string[]): MemoryStorage {
 	const storage = new MemoryStorage();
@@ -42,11 +42,14 @@ function writeFile(filePath: string, buffer: Buffer) {
 	console.log(`${filePath} ${buffer.byteLength} bytes`);
 }
 
-export function build() {
+export function handleBuildCommand() {
+	const dataSerializer = new DataSerializer();
+
 	const manifestPath = getArg('--manifest=');
 	const exampleData = tryGetArg('--exampleData=') === 'true';
 	const dataPath = exampleData ? null : getArg('--data=');
 	const outDir = getArg('--outDir=');
+	const target = tryGetArg('--target=') || 'release';
 
 	const manifestRaw = fs.readFileSync(manifestPath, 'utf8');
 
@@ -70,11 +73,12 @@ export function build() {
 				filePaths: contentStorage.getFilePaths(['binary', 'text'])
 			}
 		};
-	} else {
+	} else if (dataPath) {
 		const templateDataRaw = fs.readFileSync(dataPath, 'utf8');
-		const dataSerializer = new DataSerializer();
 		templateData = dataSerializer.deserialize(templateDataRaw);
 		contentStorage = readFiles(getBasePath(dataPath), templateData.meta.filePaths);
+	} else {
+		throw new Error('Invalid usage');
 	}
 
 	const pagesResolver = new PagesResolver(templateData.configuration.pagePathStrategy);
@@ -82,13 +86,26 @@ export function build() {
 	const renderer = new TemplateRenderer(false, templateStorage, contentStorage, pagesDataGenerator);
 	const usedFilesScanner = new UsedFilesScanner(contentStorage);
 
-	Exporter.exportRelease(manifest, templateData, contentStorage, templateStorage, pagesResolver, renderer, usedFilesScanner,
-		(filePath, contentType: ContentType, content) => {
-			const finalPath = path.join(outDir, filePath);
-			if (contentType === 'text') {
-				writeFile(finalPath, Buffer.from(content, 'utf8'));
-			} else {
-				writeFile(finalPath, Buffer.from(content, 'binary'));
-			}
-		});
+	const exportHandler = (filePath: string, contentType: ContentType, content: string) => {
+		const finalPath = path.join(outDir, filePath);
+		if (contentType === 'text') {
+			writeFile(finalPath, Buffer.from(content, 'utf8'));
+		} else {
+			writeFile(finalPath, Buffer.from(content, 'binary'));
+		}
+	};
+
+	switch (target) {
+		case 'release':
+			Exporter.exportRelease(manifest, templateData, contentStorage, templateStorage, pagesResolver,
+				renderer, usedFilesScanner, exportHandler);
+			break;
+
+		case 'data':
+			Exporter.exportData(manifest, templateData, contentStorage, dataSerializer, usedFilesScanner, exportHandler);
+			break;
+
+		default:
+			throw new Error(`Unsupported target: ${target}`);
+	}
 }

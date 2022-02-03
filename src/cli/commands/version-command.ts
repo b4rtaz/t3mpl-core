@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-export function version() {
+export function handleVersionCommand() {
 	const baseDir = path.dirname(require.main.filename);
 	const filePath = baseDir.endsWith('bin')
 		? '/../package.json'
